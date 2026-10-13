@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Check, ExternalLink, LoaderCircle, X } from "lucide-react";
+import { BookOpen, Check, CirclePlay, ExternalLink, LoaderCircle, X } from "lucide-react";
 import type { ProblemView } from "@/lib/types";
 import DifficultyBadge from "./DifficultyBadge";
 import ProblemTimer from "./ProblemTimer";
@@ -124,6 +125,23 @@ export default function ProblemModal({
           >
             {busy ? <LoaderCircle className="size-7 animate-spin" /> : <X className="size-7" strokeWidth={3.5} />}
           </button>
+        </div>
+
+        <div className="mt-3 grid grid-cols-2 gap-3">
+          <Link
+            href={`/solutions/${problem.slug}`}
+            className="btn-3d flex items-center justify-center gap-2 rounded-2xl border-2 border-zinc-300 bg-white py-2.5 text-sm font-extrabold uppercase tracking-wide text-zinc-600 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+          >
+            <BookOpen className="size-4" /> Explanation
+          </Link>
+          <a
+            href={problem.videoUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-3d flex items-center justify-center gap-2 rounded-2xl border-2 border-zinc-300 bg-white py-2.5 text-sm font-extrabold uppercase tracking-wide text-zinc-600 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+          >
+            <CirclePlay className="size-4" /> Video
+          </a>
         </div>
 
         {error && <p className="mt-4 text-center text-sm font-semibold text-red-500">{error}</p>}

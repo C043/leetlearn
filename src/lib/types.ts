@@ -3,8 +3,10 @@ export type Difficulty = "EASY" | "MEDIUM" | "HARD";
 /** Serializable problem shape passed from server to client components. */
 export interface ProblemView {
   id: string;
+  slug: string;
   title: string;
   leetcodeUrl: string;
+  videoUrl: string;
   difficulty: Difficulty;
   order: number;
   isSolved: boolean;

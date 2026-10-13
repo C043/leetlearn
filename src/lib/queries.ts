@@ -1,12 +1,16 @@
 import type { Pattern, Problem } from "@prisma/client";
+import { slugFromUrl, videoUrlFor } from "@/content/solutions";
 import { prisma } from "./db";
 import type { PatternSummary, ProblemView } from "./types";
 
 function toView(problem: Problem & { pattern: Pick<Pattern, "name"> }): ProblemView {
+  const slug = slugFromUrl(problem.leetcodeUrl);
   return {
     id: problem.id,
+    slug,
     title: problem.title,
     leetcodeUrl: problem.leetcodeUrl,
+    videoUrl: videoUrlFor(slug, problem.title),
     difficulty: problem.difficulty,
     order: problem.order,
     isSolved: problem.isSolved,
