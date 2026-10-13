@@ -1,0 +1,19 @@
+import type { MetadataRoute } from "next";
+
+export default function manifest(): MetadataRoute.Manifest {
+  return {
+    name: "LeetLearn",
+    short_name: "LeetLearn",
+    description: "Pattern-based LeetCode learning paths with weekly spaced repetition.",
+    start_url: "/",
+    scope: "/",
+    display: "standalone",
+    background_color: "#ffffff",
+    theme_color: "#22c55e",
+    icons: [
+      { src: "/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
+      { src: "/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
+      { src: "/icon-maskable-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
+    ],
+  };
+}

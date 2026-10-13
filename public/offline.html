@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#22c55e" />
+    <title>LeetLearn · Offline</title>
+    <style>
+      :root { color-scheme: light dark; --bg: #ffffff; --fg: #3c3c3c; }
+      @media (prefers-color-scheme: dark) { :root { --bg: #0b0f14; --fg: #e8eaed; } }
+      body {
+        margin: 0; min-height: 100vh; display: grid; place-items: center; text-align: center;
+        background: var(--bg); color: var(--fg); padding: 0 16px;
+        font-family: ui-rounded, "SF Pro Rounded", "Nunito", "Segoe UI", system-ui, sans-serif;
+      }
+      img { width: 96px; height: 96px; }
+      button {
+        margin-top: 16px; padding: 12px 24px; border: 0; border-radius: 16px; cursor: pointer;
+        background: #22c55e; color: #fff; font: inherit; font-weight: 700;
+        box-shadow: 0 4px 0 #15803d;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <img src="/icon-192.png" alt="" />
+      <h1>You're offline</h1>
+      <p>LeetLearn needs a connection to load your progress.</p>
+      <button onclick="location.reload()">Try again</button>
+    </main>
+  </body>
+</html>
