@@ -2,25 +2,63 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #3c3c3c;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: ui-rounded, "SF Pro Rounded", "Nunito", "Segoe UI", system-ui, sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #0b0f14;
+    --foreground: #e8eaed;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Duolingo-style "pressable" button: thick bottom border that collapses on press */
+@utility btn-3d {
+  border-bottom-width: var(--depth, 4px);
+  transition:
+    transform 80ms ease-out,
+    border-bottom-width 80ms ease-out,
+    background-color 150ms;
+  &:active:not(:disabled) {
+    transform: translateY(var(--depth, 4px));
+    border-bottom-width: 0;
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+@keyframes pop {
+  from { transform: scale(0.94); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@utility animate-float {
+  animation: float 1.6s ease-in-out infinite;
+}
+
+@utility animate-pop {
+  animation: pop 140ms ease-out;
+}
+
+:focus-visible {
+  outline: 3px solid #1cb0f6;
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-float, .animate-pop { animation: none; }
 }

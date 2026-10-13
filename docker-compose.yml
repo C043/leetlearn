@@ -1,16 +1,14 @@
-version: '3.8'
-
 services:
   db:
     image: postgres:15-alpine
     container_name: leetlearn-db
+    ports:
+      - "5432:5432"
     restart: always
     environment:
       POSTGRES_USER: leetlearn
       POSTGRES_PASSWORD: leetlearn_pass
       POSTGRES_DB: leetlearn_db
-    ports:
-      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:

@@ -1,0 +1,58 @@
+import type { Pattern, Problem } from "@prisma/client";
+import { prisma } from "./db";
+import type { PatternSummary, ProblemView } from "./types";
+
+function toView(problem: Problem & { pattern: Pick<Pattern, "name"> }): ProblemView {
+  return {
+    id: problem.id,
+    title: problem.title,
+    leetcodeUrl: problem.leetcodeUrl,
+    difficulty: problem.difficulty,
+    order: problem.order,
+    isSolved: problem.isSolved,
+    solvedUnder15Min: problem.solvedUnder15Min,
+    lastSolvedAt: problem.lastSolvedAt?.toISOString() ?? null,
+    unlocked: problem.unlocked,
+    inReview: problem.inReview,
+    patternName: problem.pattern.name,
+  };
+}
+
+export async function getPatternSummaries(): Promise<PatternSummary[]> {
+  const patterns = await prisma.pattern.findMany({
+    orderBy: { order: "asc" },
+    include: { problems: { select: { isSolved: true } } },
+  });
+  return patterns.map((p) => ({
+    id: p.id,
+    name: p.name,
+    order: p.order,
+    solved: p.problems.filter((x) => x.isSolved).length,
+    total: p.problems.length,
+  }));
+}
+
+export async function getPattern(order: number) {
+  const pattern = await prisma.pattern.findUnique({
+    where: { order },
+    include: {
+      problems: { orderBy: { order: "asc" }, include: { pattern: { select: { name: true } } } },
+    },
+  });
+  if (!pattern) return null;
+  return {
+    name: pattern.name,
+    description: pattern.description,
+    order: pattern.order,
+    problems: pattern.problems.map(toView),
+  };
+}
+
+export async function getReviewQueue(): Promise<ProblemView[]> {
+  const problems = await prisma.problem.findMany({
+    where: { inReview: true },
+    orderBy: [{ addedToReviewAt: "asc" }, { title: "asc" }],
+    include: { pattern: { select: { name: true } } },
+  });
+  return problems.map(toView);
+}

@@ -1,0 +1,48 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+model Pattern {
+  id          String    @id @default(uuid())
+  name        String
+  description String    @db.Text
+  order       Int       @unique
+  problems    Problem[]
+}
+
+model Problem {
+  id               String     @id @default(uuid())
+  title            String
+  leetcodeUrl      String
+  difficulty       Difficulty
+  order            Int        // Da 1 a 10 all'interno del pattern
+
+  isSolved         Boolean    @default(false)
+  solvedUnder15Min Boolean    @default(false)
+  lastSolvedAt     DateTime?
+  unlocked         Boolean    @default(false)
+
+  inReview         Boolean    @default(false)
+  addedToReviewAt  DateTime?
+
+  patternId        String
+  pattern          Pattern    @relation(fields: [patternId], references: [id], onDelete: Cascade)
+
+  @@unique([patternId, order])
+}
+
+model ReviewSystemState {
+  id            Int      @id @default(1)
+  lastRotatedAt DateTime @default(now())
+}

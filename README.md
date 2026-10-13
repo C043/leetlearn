@@ -37,15 +37,27 @@ Instead of solving random problems, LeetLearn provides 16 pattern-based learning
    git clone https://github.com/username/leetlearn.git
    cd leetlearn
 
-# 2. Start the containers:
+# 2. Start the containers (schema sync + seeding run automatically on boot):
    docker compose up --build -d
 
-# 3. Run database migrations and seed initial data:
-   docker compose exec app npx prisma migrate dev --name init
-   docker compose exec app npx prisma db seed
-
-# 4. Access the web application at http://localhost:3000.
+# 3. Access the web application at http://localhost:3000.
 ```
+
+Seeding is idempotent: it refreshes problem titles/URLs from `src/content/` but never resets your progress.
+
+### Local Development
+
+```bash
+cp .env.example .env          # points at the Postgres exposed by docker compose
+docker compose up -d db
+npm install
+npx prisma db push && npx prisma db seed
+npm run dev
+```
+
+### Editing the Problem List
+
+The 160 problems live in `src/content/patterns/*.ts` (one file per path). The corpus is validated at build and seed time: 16 paths, 10 problems each, in the order 2 Easy → 7 Medium → 1 Hard, with URLs matching slugs.
 
 ---
 
