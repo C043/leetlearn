@@ -37,7 +37,7 @@ export default async function PatternPage({
       <header className="sticky top-0 z-40 border-b-2 border-zinc-200 bg-[var(--background)]/90 backdrop-blur dark:border-zinc-800">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
           <Link href="/" className="text-2xl font-black tracking-tight text-green-500">
-            leetlearn
+            LeetLearn
           </Link>
           <span className="flex items-center gap-1.5 font-extrabold text-orange-500" title="Problems solved">
             <Flame className="size-5" fill="currentColor" />
