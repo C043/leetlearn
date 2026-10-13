@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Check, ExternalLink, LoaderCircle, X } from "lucide-react";
 import type { ProblemView } from "@/lib/types";
 import DifficultyBadge from "./DifficultyBadge";
+import ProblemTimer from "./ProblemTimer";
 
 export default function ProblemModal({
   problem,
@@ -98,10 +99,12 @@ export default function ProblemModal({
           href={problem.leetcodeUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="btn-3d mb-6 flex w-full items-center justify-center gap-2 rounded-2xl border-sky-600 bg-sky-500 py-3 font-extrabold uppercase tracking-wide text-white hover:bg-sky-400"
+          className="btn-3d mb-3 flex w-full items-center justify-center gap-2 rounded-2xl border-sky-600 bg-sky-500 py-3 font-extrabold uppercase tracking-wide text-white hover:bg-sky-400"
         >
           Open on LeetCode <ExternalLink className="size-4" />
         </a>
+
+        <ProblemTimer problemId={problem.id} />
 
         <p className="mb-3 text-center font-bold">Solved in under 15 minutes?</p>
         <div className="grid grid-cols-2 gap-3">
