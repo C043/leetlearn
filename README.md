@@ -16,7 +16,7 @@ Instead of solving random problems, LeetLearn provides 16 pattern-based learning
 - 160 Free Problems: Each path contains exactly 10 free LeetCode problems (2 Easy -> 7 Medium -> 1 Hard).
 - Sequential Unlocking: Sequential progression per path where completing one problem unlocks the next.
 - 15-Minute Benchmark: Track whether problems were completed in under 15 minutes to identify weak spots.
-- Practice Timer: Optional per-problem 15-minute countdown that plays a chime when time is up. Timers persist across page reloads and keep running after the problem modal is closed. The timer is purely a utility and never records anything about the solve.
+- Practice Timer: Optional per-problem 15-minute countdown that plays a chime when time is up. The timer resets whenever the problem modal is closed. The timer is purely a utility and never records anything about the solve.
 - Solution Walkthroughs: Every problem has a dedicated page at `/solutions/<slug>` with the key idea, numbered steps illustrated by inline SVG diagrams (arrays, grids, trees, linked lists, graphs, intervals, histograms and stacks), time and space complexity, and common pitfalls.
 - Video Links: Each problem links to a curated video walkthrough, falling back to a YouTube search for the problem.
 - Installable PWA: Web app manifest, app icons and a service worker allow installing LeetLearn on desktop and mobile. Pages are network-first with a cached fallback and an offline page; static assets are cache-first.

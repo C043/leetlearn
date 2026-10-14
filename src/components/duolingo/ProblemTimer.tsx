@@ -1,16 +1,10 @@
 "use client";
 
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useState } from "react";
 import { RotateCcw, Timer } from "lucide-react";
-import { unlockAudio } from "@/lib/chime";
-import {
-  TIMER_MS,
-  getTimersServerSnapshot,
-  getTimersSnapshot,
-  resetTimer,
-  startTimer,
-  subscribeTimers,
-} from "@/lib/problemTimers";
+import { playChime, unlockAudio } from "@/lib/chime";
+
+const TIMER_MS = 15 * 60 * 1000;
 
 function formatClock(ms: number) {
   const totalSeconds = Math.ceil(ms / 1000);
@@ -19,10 +13,12 @@ function formatClock(ms: number) {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
-/** Optional 15-minute stopwatch for a problem. Rings when done; never affects solve tracking. */
-export default function ProblemTimer({ problemId }: { problemId: string }) {
-  const timers = useSyncExternalStore(subscribeTimers, getTimersSnapshot, getTimersServerSnapshot);
-  const startedAt = timers[problemId];
+/**
+ * Optional 15-minute stopwatch for a problem. Rings when done; never affects solve tracking.
+ * State is local, so the timer resets whenever the modal closes (and with it this component).
+ */
+export default function ProblemTimer() {
+  const [startedAt, setStartedAt] = useState<number>();
   const [now, setNow] = useState(() => Date.now());
 
   const running = startedAt !== undefined && now - startedAt < TIMER_MS;
@@ -30,12 +26,18 @@ export default function ProblemTimer({ problemId }: { problemId: string }) {
   useEffect(() => {
     if (startedAt === undefined) return;
     const id = setInterval(() => setNow(Date.now()), 250);
-    return () => clearInterval(id);
+    const ring = setTimeout(playChime, startedAt + TIMER_MS - Date.now());
+    return () => {
+      clearInterval(id);
+      clearTimeout(ring);
+    };
   }, [startedAt]);
 
   function start() {
     unlockAudio();
-    startTimer(problemId);
+    const t = Date.now();
+    setNow(t);
+    setStartedAt(t);
   }
 
   if (startedAt === undefined) {
@@ -65,7 +67,7 @@ export default function ProblemTimer({ problemId }: { problemId: string }) {
           {done ? "Time's up!" : formatClock(TIMER_MS - elapsed)}
         </span>
         <button
-          onClick={done ? start : () => resetTimer(problemId)}
+          onClick={done ? start : () => setStartedAt(undefined)}
           aria-label={done ? "Restart timer" : "Reset timer"}
           className="flex items-center gap-1 rounded-full px-2 py-1 text-xs font-extrabold uppercase tracking-wide text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800"
         >

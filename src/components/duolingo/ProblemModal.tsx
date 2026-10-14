@@ -105,7 +105,7 @@ export default function ProblemModal({
           Open on LeetCode <ExternalLink className="size-4" />
         </a>
 
-        <ProblemTimer problemId={problem.id} />
+        <ProblemTimer />
 
         <p className="mb-3 text-center font-bold">Solved in under 15 minutes?</p>
         <div className="grid grid-cols-2 gap-3">
