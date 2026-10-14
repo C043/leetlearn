@@ -32,6 +32,16 @@ It structures LeetCode practice into 16 pattern-based learning paths with a Duol
      - Priority 1: solvedUnder15Min == false.
      - Priority 2: lastSolvedAt timestamp is oldest.
 
+### 4. Streaks and Reminders
+- Any solve (path or review) upserts today's `ActivityDay` row, keyed YYYY-MM-DD in `AppSettings.timeZone` (sent by the client on solve/subscribe).
+- The streak is derived from consecutive `ActivityDay` rows (src/lib/streak.ts), so there is no counter to keep in sync.
+- src/lib/streak-reminders.ts runs every 10 minutes via node-cron: stage 1 at `reminderHour`, stage 2 at 22:00, only while the streak is at risk; each stage fires at most once a day.
+- Push is Web Push with VAPID (src/lib/push.ts). Keys come from env, or are generated and stored in `AppSettings`. Expired subscriptions (404/410) are pruned.
+- public/sw.js must always show a notification on `push`: iOS revokes permission otherwise.
+
+### Schema Changes
+- Docker runs `prisma db push` on boot against a database already in use. Keep changes additive (new tables, nullable or defaulted columns). Never rename or drop columns.
+
 ---
 
 ## Database Schema (prisma/schema.prisma)
@@ -85,6 +95,33 @@ model ReviewSystemState {
   id            Int      @id @default(1)
   lastRotatedAt DateTime @default(now())
 }
+
+// One row per calendar day (in the user's time zone) with at least one solve.
+// The streak is derived from consecutive days, so there is no counter to drift.
+model ActivityDay {
+  day    String @id // YYYY-MM-DD
+  solves Int    @default(0)
+}
+
+// Single-row app settings (single-user mode).
+model AppSettings {
+  id                 Int     @id @default(1)
+  timeZone           String  @default("UTC")
+  reminderHour       Int     @default(20) // local hour for the first streak reminder
+  lastReminderDay    String? // YYYY-MM-DD of the last reminder sent
+  lastReminderStage  Int     @default(0)  // 1 = evening nudge, 2 = last call
+  // Generated on first use unless VAPID_PUBLIC_KEY / VAPID_PRIVATE_KEY are set
+  vapidPublicKey     String?
+  vapidPrivateKey    String?
+}
+
+model PushSubscription {
+  id        String   @id @default(uuid())
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+}
 ```
 
 ---
@@ -106,5 +143,5 @@ model ReviewSystemState {
 1. Use Next.js App Router (src/app).
 2. API routes located under src/app/api/.
 3. Singleton Prisma client in src/lib/db.ts to prevent connection pool exhaustion during development.
-4. Component code structured inside src/components/duolingo/ and src/components/review/.
+4. Component code structured inside src/components/duolingo/, src/components/review/ and src/components/streak/.
 5. Do not include authentication modules.

@@ -28,6 +28,8 @@ services:
     environment:
       DATABASE_URL: "postgresql://leetlearn:leetlearn_pass@db:5432/leetlearn_db?schema=public"
       NODE_ENV: "production"
+      # Optional, for streak reminders (Apple rejects localhost subjects)
+      VAPID_SUBJECT: "${VAPID_SUBJECT:-mailto:leetlearn@example.com}"
     depends_on:
       db:
         condition: service_healthy

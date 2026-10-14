@@ -4,16 +4,18 @@ import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { BookOpen, Check, CirclePlay, ExternalLink, LoaderCircle, X } from "lucide-react";
-import type { ProblemView } from "@/lib/types";
+import type { ProblemView, StreakView } from "@/lib/types";
 import DifficultyBadge from "./DifficultyBadge";
 import ProblemTimer from "./ProblemTimer";
 
 export default function ProblemModal({
   problem,
   onClose,
+  onStreakExtended,
 }: {
   problem: ProblemView;
   onClose: () => void;
+  onStreakExtended: (streak: StreakView) => void;
 }) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
@@ -34,15 +36,19 @@ export default function ProblemModal({
       const res = await fetch(`/api/problems/${problem.id}/solve`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ solvedUnder15Min }),
+        body: JSON.stringify({
+          solvedUnder15Min,
+          timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        }),
       });
+      const body = await res.json().catch(() => ({}));
       if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
         throw new Error(body.error ?? `Request failed (${res.status})`);
       }
       startTransition(() => {
         router.refresh();
         onClose();
+        if (body.streakExtended && body.streak) onStreakExtended(body.streak);
       });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong");

@@ -1,12 +1,15 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { Flame } from "lucide-react";
+import { CircleCheck } from "lucide-react";
 import { getPattern, getPatternSummaries, getReviewQueue } from "@/lib/queries";
+import { getVapidKeys } from "@/lib/push";
 import { nextScheduledRotation, rotateReviewQueueIfDue } from "@/lib/review-service";
+import { getSettings, getStreak } from "@/lib/streak";
 import { ProblemModalProvider } from "@/components/duolingo/ProblemModalProvider";
 import PatternPath from "@/components/duolingo/PatternPath";
 import PatternSwitcher from "@/components/duolingo/PatternSwitcher";
 import ReviewQueue from "@/components/review/ReviewQueue";
+import StreakButton from "@/components/streak/StreakButton";
 
 export const dynamic = "force-dynamic";
 
@@ -21,10 +24,13 @@ export default async function PatternPage({
   // Cheap safety net in case the cron job didn't fire (e.g. dev server restarts)
   await rotateReviewQueueIfDue();
 
-  const [pattern, summaries, review] = await Promise.all([
+  const [pattern, summaries, review, streak, settings, vapid] = await Promise.all([
     getPattern(order),
     getPatternSummaries(),
     getReviewQueue(),
+    getStreak(),
+    getSettings(),
+    getVapidKeys(),
   ]);
   if (!pattern) notFound();
 
@@ -39,11 +45,17 @@ export default async function PatternPage({
           <Link href="/" className="text-2xl font-black tracking-tight text-green-500">
             LeetLearn
           </Link>
-          <span className="flex items-center gap-1.5 font-extrabold text-orange-500" title="Problems solved">
-            <Flame className="size-5" fill="currentColor" />
-            {totalSolved}
-            <span className="text-sm font-bold text-zinc-400">/ {total}</span>
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="flex items-center gap-1.5 font-extrabold text-green-500" title="Problems solved">
+              <CircleCheck className="size-5" strokeWidth={3} />
+              {totalSolved}
+              <span className="text-sm font-bold text-zinc-400">/ {total}</span>
+            </span>
+            <StreakButton
+              streak={streak}
+              prefs={{ reminderHour: settings.reminderHour, vapidPublicKey: vapid.publicKey }}
+            />
+          </div>
         </div>
       </header>
 

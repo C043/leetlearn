@@ -1,8 +1,13 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
+import { getStreak, recordActivity, rememberTimeZone } from "@/lib/streak";
 
-const bodySchema = z.object({ solvedUnder15Min: z.boolean() });
+const bodySchema = z.object({
+  solvedUnder15Min: z.boolean(),
+  // Optional so older cached clients keep working
+  timeZone: z.string().optional(),
+});
 
 export async function POST(
   request: Request,
@@ -44,5 +49,9 @@ export async function POST(
     }),
   ]);
 
-  return NextResponse.json(updated);
+  await rememberTimeZone(parsed.data.timeZone);
+  const firstToday = await recordActivity();
+  const streak = await getStreak();
+
+  return NextResponse.json({ ...updated, streak, streakExtended: firstToday });
 }

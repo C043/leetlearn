@@ -1,5 +1,6 @@
 import cron from "node-cron";
 import { rotateReviewQueueIfDue } from "./review-service";
+import { sendStreakRemindersIfDue } from "./streak-reminders";
 
 const globalForCron = globalThis as unknown as { reviewCronStarted?: boolean };
 
@@ -26,6 +27,20 @@ export async function startReviewScheduler() {
     timezone: "UTC",
   });
 
+  // Streak reminders are checked often; each stage still fires once a day
+  cron.schedule("*/10 * * * *", () => void runStreakReminders());
+
   // Catch up on a Saturday missed while the app was offline
   await runRotation("startup");
+}
+
+async function runStreakReminders() {
+  try {
+    const result = await sendStreakRemindersIfDue();
+    if (result) {
+      console.log(`[streak] reminder stage ${result.stage}: sent ${result.sent}, failed ${result.failed}`);
+    }
+  } catch (err) {
+    console.error("[streak] reminder check failed:", err);
+  }
 }

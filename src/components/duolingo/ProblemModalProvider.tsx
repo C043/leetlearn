@@ -1,7 +1,8 @@
 "use client";
 
 import { createContext, useCallback, useContext, useState } from "react";
-import type { ProblemView } from "@/lib/types";
+import type { ProblemView, StreakView } from "@/lib/types";
+import StreakCelebration from "../streak/StreakCelebration";
 import ProblemModal from "./ProblemModal";
 
 interface ModalContextValue {
@@ -18,11 +19,21 @@ export function ProblemModalProvider({ children }: { children: React.ReactNode }
   const [problem, setProblem] = useState<ProblemView | null>(null);
   const openProblem = useCallback((p: ProblemView) => setProblem(p), []);
   const close = useCallback(() => setProblem(null), []);
+  const [celebration, setCelebration] = useState<StreakView | null>(null);
+  const closeCelebration = useCallback(() => setCelebration(null), []);
 
   return (
     <ModalContext.Provider value={{ openProblem }}>
       {children}
-      {problem && <ProblemModal key={problem.id} problem={problem} onClose={close} />}
+      {problem && (
+        <ProblemModal
+          key={problem.id}
+          problem={problem}
+          onClose={close}
+          onStreakExtended={setCelebration}
+        />
+      )}
+      {celebration && <StreakCelebration streak={celebration} onClose={closeCelebration} />}
     </ModalContext.Provider>
   );
 }

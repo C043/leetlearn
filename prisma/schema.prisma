@@ -46,3 +46,30 @@ model ReviewSystemState {
   id            Int      @id @default(1)
   lastRotatedAt DateTime @default(now())
 }
+
+// One row per calendar day (in the user's time zone) with at least one solve.
+// The streak is derived from consecutive days, so there is no counter to drift.
+model ActivityDay {
+  day    String @id // YYYY-MM-DD
+  solves Int    @default(0)
+}
+
+// Single-row app settings (single-user mode).
+model AppSettings {
+  id                 Int     @id @default(1)
+  timeZone           String  @default("UTC")
+  reminderHour       Int     @default(20) // local hour for the first streak reminder
+  lastReminderDay    String? // YYYY-MM-DD of the last reminder sent
+  lastReminderStage  Int     @default(0)  // 1 = evening nudge, 2 = last call
+  // Generated on first use unless VAPID_PUBLIC_KEY / VAPID_PRIVATE_KEY are set
+  vapidPublicKey     String?
+  vapidPrivateKey    String?
+}
+
+model PushSubscription {
+  id        String   @id @default(uuid())
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+}
