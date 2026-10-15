@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { CircleCheck, CircleX, Gem, RotateCcw, Trophy, X } from "lucide-react";
 import { matchesAnswer } from "@/content/exercises/answer";
 import type { TrainingItem } from "@/lib/training";
+import { playCorrect, playFanfare, playWrong } from "@/lib/training-sounds";
 import CodeBlock from "../solution/CodeBlock";
 import Rich from "../solution/Rich";
 
@@ -63,7 +64,11 @@ export default function TrainingSession({
       const option = current.options[choice!];
       result = { correct: !!option.correct, why: option.correct ? undefined : option.why };
     }
-    if (!result.correct) setMissed((m) => new Set(m).add(current.id));
+    if (result.correct) playCorrect();
+    else {
+      playWrong();
+      setMissed((m) => new Set(m).add(current.id));
+    }
     setFeedback(result);
   }
 
@@ -79,7 +84,9 @@ export default function TrainingSession({
 
   function next() {
     if (!feedback) return;
-    const finishedPerfect = feedback.correct && queue.length === 1 && missed.size === 0;
+    const finished = feedback.correct && queue.length === 1;
+    if (finished) playFanfare();
+    const finishedPerfect = finished && missed.size === 0;
     if (finishedPerfect && mastery && !mastery.alreadyMastered) void saveMastery(mastery.problemId);
     setQueue((q) => (feedback.correct ? q.slice(1) : [...q.slice(1), q[0]]));
     setInput("");

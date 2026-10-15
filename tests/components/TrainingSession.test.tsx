@@ -7,11 +7,14 @@ import { jsonResponse } from "../helpers/fixtures";
 
 const router = vi.hoisted(() => ({ refresh: vi.fn(), push: vi.fn() }));
 vi.mock("next/navigation", () => ({ useRouter: () => router }));
+const sounds = vi.hoisted(() => ({ playCorrect: vi.fn(), playWrong: vi.fn(), playFanfare: vi.fn() }));
+vi.mock("@/lib/training-sounds", () => sounds);
 
 const fetchMock = vi.fn<typeof fetch>();
 
 beforeEach(() => {
   router.refresh.mockReset();
+  for (const play of Object.values(sounds)) play.mockReset();
   fetchMock.mockReset();
   fetchMock.mockResolvedValue(jsonResponse({ masteredAt: "2024-05-10T12:00:00.000Z" }));
   vi.stubGlobal("fetch", fetchMock);
@@ -229,6 +232,38 @@ describe("the results screen", () => {
     await user.click(continueButton());
     expect(screen.queryByText(/master/i)).toBeNull();
     expect(fetchMock).not.toHaveBeenCalled();
+  });
+});
+
+describe("sounds", () => {
+  it("dings on a correct answer", async () => {
+    const user = start([typedItem("a"), typedItem("b")]);
+    await typeAndCheck(user, "isalnum");
+    expect(sounds.playCorrect).toHaveBeenCalledTimes(1);
+    expect(sounds.playWrong).not.toHaveBeenCalled();
+  });
+
+  it("buzzes on a wrong answer, typed or picked", async () => {
+    const user = start([typedItem("a"), choiceItem("c")]);
+    await typeAndCheck(user, "wrong");
+    await user.click(continueButton());
+    await user.click(screen.getByRole("radio", { name: /wrong one/i }));
+    await user.click(checkButton());
+    expect(sounds.playWrong).toHaveBeenCalledTimes(2);
+    expect(sounds.playCorrect).not.toHaveBeenCalled();
+  });
+
+  it("plays the fanfare once, when the last exercise is done", async () => {
+    const user = start([typedItem("a"), typedItem("b")]);
+    await typeAndCheck(user, "wrong");
+    await user.click(continueButton());
+    await typeAndCheck(user, "isalnum");
+    await user.click(continueButton());
+    await typeAndCheck(user, "isalnum");
+    expect(sounds.playFanfare).not.toHaveBeenCalled();
+    await user.click(continueButton());
+    expect(screen.getByText("Training complete!")).toBeInTheDocument();
+    expect(sounds.playFanfare).toHaveBeenCalledTimes(1);
   });
 });
 

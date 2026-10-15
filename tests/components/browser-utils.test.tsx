@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import DifficultyBadge from "@/components/duolingo/DifficultyBadge";
 import { formatRotation } from "@/components/review/formatRotation";
+import { installAudio } from "../helpers/audio";
 
 describe("DifficultyBadge", () => {
   it.each([
@@ -68,52 +69,6 @@ describe("ServiceWorkerRegistrar", () => {
 });
 
 describe("chime", () => {
-  /** Records the Web Audio graph the chime builds. */
-  function installAudio(state: "running" | "suspended" = "running") {
-    const oscillators: { frequency: number; start: number; stop: number; type: string }[] = [];
-    const gains: { calls: [string, number, number][] }[] = [];
-    const instances: FakeContext[] = [];
-    class FakeContext {
-      state = state;
-      currentTime = 10;
-      destination = {};
-      resume = vi.fn(async () => {
-        this.state = "running";
-      });
-      constructor() {
-        instances.push(this);
-      }
-      createOscillator() {
-        const o = { type: "", frequency: { value: 0 }, start: 0, stop: 0 };
-        const rec = { frequency: 0, start: 0, stop: 0, type: "" };
-        oscillators.push(rec);
-        return {
-          set type(t: string) {
-            rec.type = t;
-          },
-          frequency: new Proxy(o.frequency, {
-            set: (_, __, v) => ((rec.frequency = v), true),
-          }),
-          connect: (g: unknown) => g,
-          start: (t: number) => void (rec.start = t),
-          stop: (t: number) => void (rec.stop = t),
-        };
-      }
-      createGain() {
-        const rec = { calls: [] as [string, number, number][] };
-        gains.push(rec);
-        const param = {
-          setValueAtTime: (v: number, t: number) => rec.calls.push(["set", v, t]),
-          linearRampToValueAtTime: (v: number, t: number) => rec.calls.push(["linear", v, t]),
-          exponentialRampToValueAtTime: (v: number, t: number) => rec.calls.push(["exp", v, t]),
-        };
-        return { gain: param, connect: (d: unknown) => d };
-      }
-    }
-    vi.stubGlobal("AudioContext", FakeContext);
-    return { oscillators, gains, instances };
-  }
-
   beforeEach(() => vi.resetModules());
 
   it("plays G5, B5, E6, each with an octave overtone, in sequence", async () => {
