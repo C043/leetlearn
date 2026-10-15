@@ -1,4 +1,6 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
+import { Dumbbell } from "lucide-react";
 import { getPattern } from "@/lib/queries";
 import { getHeaderData } from "@/lib/header-data";
 import { ProblemModalProvider } from "@/components/duolingo/ProblemModalProvider";
@@ -20,6 +22,8 @@ export default async function PatternPage({
   if (!pattern) notFound();
 
   const solvedHere = pattern.problems.filter((p) => p.isSolved).length;
+  const hasTraining = pattern.problems.some((p) => p.hasExercises);
+  const canTrain = pattern.problems.some((p) => p.isSolved && p.hasExercises);
 
   return (
     <ProblemModalProvider>
@@ -34,6 +38,17 @@ export default async function PatternPage({
             </p>
             <h1 className="mt-1 text-2xl font-black">{pattern.name}</h1>
             <p className="mt-1 text-sm text-green-50">{pattern.description}</p>
+            {hasTraining &&
+              (canTrain ? (
+                <Link
+                  href={`/patterns/${pattern.order}/train`}
+                  className="btn-3d mt-4 inline-flex items-center gap-2 rounded-2xl border-2 border-green-800 bg-white px-4 py-2 text-sm font-extrabold uppercase tracking-wide text-green-600 hover:bg-green-50"
+                >
+                  <Dumbbell className="size-4" /> Train 10 random
+                </Link>
+              ) : (
+                <p className="mt-4 text-xs font-bold text-green-100">Solve a problem to unlock training</p>
+              ))}
           </section>
           <PatternPath problems={pattern.problems} />
         </main>

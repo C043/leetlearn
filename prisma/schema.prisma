@@ -36,6 +36,9 @@ model Problem {
   inReview         Boolean    @default(false)
   addedToReviewAt  DateTime?
 
+  // Set the first time its training is finished 10/10 on the first try; never cleared
+  trainingMasteredAt DateTime?
+
   patternId        String
   pattern          Pattern    @relation(fields: [patternId], references: [id], onDelete: Cascade)
 

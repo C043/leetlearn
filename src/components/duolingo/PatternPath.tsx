@@ -8,6 +8,7 @@ import { useProblemModal } from "./ProblemModalProvider";
 const ZIGZAG = [0, 48, 76, 48, 0, -48, -76, -48];
 
 function nodeClasses(p: ProblemView) {
+  if (p.isSolved && p.mastered) return "border-violet-700 bg-violet-500 text-white";
   if (p.isSolved) return "border-amber-500 bg-amber-400 text-white";
   if (p.unlocked) return "border-green-700 bg-green-500 text-white hover:bg-green-400";
   return "border-zinc-300 bg-zinc-200 text-zinc-400 dark:border-zinc-800 dark:bg-zinc-700 dark:text-zinc-500";
@@ -47,7 +48,7 @@ export default function PatternPath({ problems }: { problems: ProblemView[] }) {
               onClick={() => openProblem(p)}
               title={p.unlocked ? p.title : `Locked — solve #${p.order - 1} first`}
               aria-label={`${p.order}. ${p.title} (${
-                p.isSolved ? "completed" : p.unlocked ? "available" : "locked"
+                p.isSolved ? (p.mastered ? "mastered" : "completed") : p.unlocked ? "available" : "locked"
               })`}
               className={`btn-3d relative flex size-[72px] items-center justify-center rounded-full [--depth:6px] disabled:cursor-not-allowed ${nodeClasses(p)} ${
                 isCurrent ? "ring-4 ring-green-500/30 ring-offset-4 ring-offset-[var(--background)]" : ""

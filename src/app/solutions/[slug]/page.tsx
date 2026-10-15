@@ -1,19 +1,12 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, CirclePlay, Code, ExternalLink, Gauge, Lightbulb, MemoryStick, TriangleAlert } from "lucide-react";
-import { PATTERNS } from "@/content";
+import { PATTERNS, findProblem } from "@/content";
 import { getCode, getSolution, videoUrlFor } from "@/content/solutions";
 import DifficultyBadge from "@/components/duolingo/DifficultyBadge";
 import CodeBlock from "@/components/solution/CodeBlock";
+import Rich from "@/components/solution/Rich";
 import Visual from "@/components/solution/Visual";
-
-function findProblem(slug: string) {
-  for (const pattern of PATTERNS) {
-    const index = pattern.problems.findIndex((p) => p.slug === slug);
-    if (index !== -1) return { pattern, problem: pattern.problems[index], order: index + 1 };
-  }
-  return null;
-}
 
 export function generateStaticParams() {
   return PATTERNS.flatMap((p) => p.problems.map((q) => ({ slug: q.slug })));
@@ -22,25 +15,6 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const found = findProblem((await params).slug);
   return { title: found ? `${found.problem.title} · LeetLearn` : "LeetLearn" };
-}
-
-/** Renders `code` and **bold** spans; everything else is plain text. */
-function Rich({ text }: { text: string }) {
-  return (
-    <>
-      {text.split(/(`[^`]+`|\*\*[^*]+\*\*)/g).map((part, i) => {
-        if (part.startsWith("`") && part.endsWith("`")) {
-          return (
-            <code key={i} className="rounded-md bg-zinc-100 px-1.5 py-0.5 font-mono text-[0.9em] text-pink-600 dark:bg-zinc-800 dark:text-pink-400">
-              {part.slice(1, -1)}
-            </code>
-          );
-        }
-        if (part.startsWith("**") && part.endsWith("**")) return <strong key={i}>{part.slice(2, -2)}</strong>;
-        return part;
-      })}
-    </>
-  );
 }
 
 export default async function SolutionPage({ params }: { params: Promise<{ slug: string }> }) {

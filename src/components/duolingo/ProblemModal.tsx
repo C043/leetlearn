@@ -3,7 +3,7 @@
 import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { BookOpen, Check, CirclePlay, ExternalLink, LoaderCircle, X } from "lucide-react";
+import { BookOpen, Check, CirclePlay, Dumbbell, ExternalLink, LoaderCircle, X } from "lucide-react";
 import type { ProblemView, StreakView } from "@/lib/types";
 import DifficultyBadge from "./DifficultyBadge";
 import ProblemTimer from "./ProblemTimer";
@@ -89,6 +89,11 @@ export default function ProblemModal({
 
         <div className="mb-5 flex flex-wrap items-center gap-2">
           <DifficultyBadge difficulty={problem.difficulty} />
+          {problem.mastered && (
+            <span className="rounded-full bg-violet-100 px-2.5 py-0.5 text-xs font-extrabold uppercase tracking-wide text-violet-700 dark:bg-violet-950 dark:text-violet-300">
+              mastered
+            </span>
+          )}
           {problem.inReview && (
             <span className="rounded-full bg-sky-100 px-2.5 py-0.5 text-xs font-extrabold uppercase tracking-wide text-sky-700 dark:bg-sky-950 dark:text-sky-300">
               review
@@ -149,6 +154,18 @@ export default function ProblemModal({
             <CirclePlay className="size-4" /> Video
           </a>
         </div>
+
+        {problem.hasExercises &&
+          (problem.isSolved ? (
+            <Link
+              href={`/train/${problem.slug}`}
+              className="btn-3d mt-3 flex w-full items-center justify-center gap-2 rounded-2xl border-violet-700 bg-violet-500 py-2.5 text-sm font-extrabold uppercase tracking-wide text-white hover:bg-violet-400"
+            >
+              <Dumbbell className="size-4" /> Train · 10 exercises
+            </Link>
+          ) : (
+            <p className="mt-3 text-center text-xs font-bold text-zinc-400">Solve it once to unlock training</p>
+          ))}
 
         {error && <p className="mt-4 text-center text-sm font-semibold text-red-500">{error}</p>}
       </div>

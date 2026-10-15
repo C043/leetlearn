@@ -39,6 +39,13 @@ It structures LeetCode practice into 16 pattern-based learning paths with a Duol
 - Push is Web Push with VAPID (src/lib/push.ts). Keys come from env, or are generated and stored in `AppSettings`. Expired subscriptions (404/410) are pruned.
 - public/sw.js must always show a notification on `push`: iOS revokes permission otherwise.
 
+### 5. Training Mode
+- Each problem has 10 exercises in src/content/exercises/<pattern>.ts (keyed by problem slug), validated at build time by src/content/exercises/index.ts; a pattern listed there must cover all 10 problems.
+- Exercise kinds: `type` (typed answer, matched by `normalizeAnswer`; `mistakes` give targeted feedback) and `choice` (every wrong option has a `why`). At least 5 typed per problem.
+- Every exercise is shown under the problem's `summary` (src/content/patterns/*.ts, required once a problem has exercises). `code` shows a snippet (`___` is the blank); `solution: true` shows the full reference solution. Complexity questions must be `choice` with `solution: true`.
+- `/train/[slug]` (one problem, only once solved) and `/patterns/[order]/train` (10 exercises dealt round-robin across solved problems). Sessions are shuffled server-side on every visit; a wrong answer goes to the back of the queue.
+- Training never touches isSolved, review or the streak. The only write: finishing a single problem's session 10/10 on the first try sets `Problem.trainingMasteredAt` (never cleared), which turns its path node violet.
+
 ### Schema Changes
 - Docker runs `prisma db push` on boot against a database already in use. Keep changes additive (new tables, nullable or defaulted columns). Never rename or drop columns.
 
@@ -84,6 +91,9 @@ model Problem {
 
   inReview         Boolean    @default(false)
   addedToReviewAt  DateTime?
+
+  // Set the first time its training is finished 10/10 on the first try; never cleared
+  trainingMasteredAt DateTime?
 
   patternId        String
   pattern          Pattern    @relation(fields: [patternId], references: [id], onDelete: Cascade)

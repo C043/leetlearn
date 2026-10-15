@@ -15,6 +15,10 @@ export interface ProblemView {
   unlocked: boolean;
   inReview: boolean;
   patternName: string;
+  /** Training exercises exist for this problem. */
+  hasExercises: boolean;
+  /** Its training was once finished 10/10 on the first try. */
+  mastered: boolean;
 }
 
 export interface PatternSummary {

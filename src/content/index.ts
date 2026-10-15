@@ -54,4 +54,13 @@ export const PROBLEM_COUNT = PATTERNS.reduce(
   0,
 );
 
+/** The problem with this slug, its pattern, and its 1-based order in the pattern. */
+export function findProblem(slug: string) {
+  for (const pattern of PATTERNS) {
+    const index = pattern.problems.findIndex((p) => p.slug === slug);
+    if (index !== -1) return { pattern, problem: pattern.problems[index], order: index + 1 };
+  }
+  return null;
+}
+
 export type { PatternInput, ProblemInput } from "./types";

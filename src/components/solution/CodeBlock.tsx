@@ -19,6 +19,7 @@ function highlight(code: string) {
     if (comment) cls = "text-zinc-500 italic";
     else if (string) cls = "text-emerald-300";
     else if (number) cls = "text-amber-300";
+    else if (word && /^_{3,}$/.test(word)) cls = "rounded bg-sky-500/25 px-1 text-sky-300 font-bold";
     else if (word && KEYWORDS.has(word)) cls = "text-pink-400";
     else if (word && (prev === "def" || prev === "class")) cls = "text-sky-300";
     else if (word === "self") cls = "text-violet-300";
@@ -30,12 +31,21 @@ function highlight(code: string) {
   return out;
 }
 
-export default function CodeBlock({ code }: { code: string }) {
+/** A `___` run in the code renders as a fill-in blank. */
+export default function CodeBlock({
+  code,
+  label = "Python",
+  copy = true,
+}: {
+  code: string;
+  label?: string;
+  copy?: boolean;
+}) {
   return (
     <div className="overflow-hidden rounded-2xl border-2 border-zinc-800 bg-zinc-900">
       <div className="flex items-center justify-between border-b border-zinc-800 px-4 py-2">
-        <span className="text-xs font-extrabold uppercase tracking-wider text-zinc-400">Python</span>
-        <CopyButton text={code} />
+        <span className="text-xs font-extrabold uppercase tracking-wider text-zinc-400">{label}</span>
+        {copy && <CopyButton text={code} />}
       </div>
       <pre className="overflow-x-auto p-4 text-sm leading-relaxed text-zinc-100">
         <code className="font-mono">{highlight(code)}</code>

@@ -1,4 +1,5 @@
 import type { Pattern, Problem } from "@prisma/client";
+import { hasExercises } from "@/content/exercises";
 import { slugFromUrl, videoUrlFor } from "@/content/solutions";
 import { prisma } from "./db";
 import type { PatternSummary, ProblemView } from "./types";
@@ -19,6 +20,8 @@ function toView(problem: Problem & { pattern: Pick<Pattern, "name"> }): ProblemV
     unlocked: problem.unlocked,
     inReview: problem.inReview,
     patternName: problem.pattern.name,
+    hasExercises: hasExercises(slug),
+    mastered: problem.trainingMasteredAt !== null,
   };
 }
 

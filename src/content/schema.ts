@@ -19,6 +19,7 @@ export const problemSchema = z.object({
   leetcodeUrl: z.string().url().startsWith("https://leetcode.com/problems/"),
   difficulty: z.enum(["EASY", "MEDIUM", "HARD"]),
   order: z.number().int().optional(),
+  summary: z.string().min(1).optional(),
 });
 
 export const patternSchema = z.object({
