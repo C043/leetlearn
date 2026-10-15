@@ -101,3 +101,8 @@ export interface Solution {
 export function defineSolutions(solutions: Record<string, Solution>) {
   return solutions;
 }
+
+/** Python reference solutions keyed by slug; the leading/trailing blank lines of each snippet are trimmed. */
+export function defineCode(code: Record<string, string>) {
+  return Object.fromEntries(Object.entries(code).map(([slug, src]) => [slug, src.replace(/^\n+|\s+$/g, "")]));
+}

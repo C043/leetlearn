@@ -18,6 +18,23 @@ import intervals from "./intervals";
 import bitManipulation from "./bit-manipulation";
 import tries from "./tries";
 
+import twoPointersCode from "./code/two-pointers";
+import slidingWindowCode from "./code/sliding-window";
+import binarySearchCode from "./code/binary-search";
+import fastSlowPointersCode from "./code/fast-slow-pointers";
+import linkedListCode from "./code/linked-list";
+import stackQueueCode from "./code/stack-queue";
+import treesDfsCode from "./code/trees-dfs";
+import treesBfsCode from "./code/trees-bfs";
+import heapCode from "./code/heap";
+import backtrackingCode from "./code/backtracking";
+import graphsCode from "./code/graphs";
+import dynamicProgrammingCode from "./code/dynamic-programming";
+import greedyCode from "./code/greedy";
+import intervalsCode from "./code/intervals";
+import bitManipulationCode from "./code/bit-manipulation";
+import triesCode from "./code/tries";
+
 const SOLUTIONS: Record<string, Solution> = {
   ...twoPointers,
   ...slidingWindow,
@@ -37,7 +54,26 @@ const SOLUTIONS: Record<string, Solution> = {
   ...tries,
 };
 
-// Fail fast, like the corpus: every problem needs a walkthrough and every walkthrough a problem.
+const CODE: Record<string, string> = {
+  ...twoPointersCode,
+  ...slidingWindowCode,
+  ...binarySearchCode,
+  ...fastSlowPointersCode,
+  ...linkedListCode,
+  ...stackQueueCode,
+  ...treesDfsCode,
+  ...treesBfsCode,
+  ...heapCode,
+  ...backtrackingCode,
+  ...graphsCode,
+  ...dynamicProgrammingCode,
+  ...greedyCode,
+  ...intervalsCode,
+  ...bitManipulationCode,
+  ...triesCode,
+};
+
+// Fail fast, like the corpus: every problem needs a walkthrough and code, and each of those a problem.
 {
   const problemSlugs = new Set(PATTERNS.flatMap((p) => p.problems.map((q) => q.slug)));
   const missing = [...problemSlugs].filter((s) => !SOLUTIONS[s]);
@@ -45,10 +81,14 @@ const SOLUTIONS: Record<string, Solution> = {
   const empty = Object.entries(SOLUTIONS)
     .filter(([, s]) => !s.idea.trim() || s.steps.length === 0)
     .map(([slug]) => slug);
+  const noCode = [...problemSlugs].filter((s) => !CODE[s]?.trim());
+  const orphanedCode = Object.keys(CODE).filter((s) => !problemSlugs.has(s));
   const errors = [
     ...missing.map((s) => `no solution for problem "${s}"`),
     ...orphaned.map((s) => `solution "${s}" matches no problem`),
     ...empty.map((s) => `solution "${s}" has no idea or steps`),
+    ...noCode.map((s) => `no code for problem "${s}"`),
+    ...orphanedCode.map((s) => `code "${s}" matches no problem`),
   ];
   if (errors.length > 0) {
     throw new Error(`Invalid solutions:\n  - ${errors.join("\n  - ")}`);
@@ -57,6 +97,11 @@ const SOLUTIONS: Record<string, Solution> = {
 
 export function getSolution(slug: string): Solution | undefined {
   return SOLUTIONS[slug];
+}
+
+/** The Python reference solution for the problem. */
+export function getCode(slug: string): string | undefined {
+  return CODE[slug];
 }
 
 /** The problem's curated video, or a YouTube search for walkthroughs of it. */

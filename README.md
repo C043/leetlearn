@@ -17,7 +17,7 @@ Instead of solving random problems, LeetLearn provides 16 pattern-based learning
 - Sequential Unlocking: Sequential progression per path where completing one problem unlocks the next.
 - 15-Minute Benchmark: Track whether problems were completed in under 15 minutes to identify weak spots.
 - Practice Timer: Optional per-problem 15-minute countdown that plays a chime when time is up. The timer resets whenever the problem modal is closed. The timer is purely a utility and never records anything about the solve.
-- Solution Walkthroughs: Every problem has a dedicated page at `/solutions/<slug>` with the key idea, numbered steps illustrated by inline SVG diagrams (arrays, grids, trees, linked lists, graphs, intervals, histograms and stacks), time and space complexity, and common pitfalls.
+- Solution Walkthroughs: Every problem has a dedicated page at `/solutions/<slug>` with the key idea, numbered steps illustrated by inline SVG diagrams (arrays, grids, trees, linked lists, graphs, intervals, histograms and stacks), a Python reference solution with syntax highlighting and a copy button, time and space complexity, and common pitfalls.
 - Video Links: Each problem links to a curated video walkthrough, falling back to a YouTube search for the problem.
 - Installable PWA: Web app manifest, app icons and a service worker allow installing LeetLearn on desktop and mobile. Pages are network-first with a cached fallback and an offline page; static assets are cache-first.
 - Daily Streak: Solving at least one problem a day (in your own time zone) grows a Duolingo-style streak shown as a flame in the header, with a 7-day calendar, longest streak and a full-screen "day streak!" celebration on the first solve of each day. Re-solving review problems counts too.
@@ -75,6 +75,8 @@ The 160 problems live in `src/content/patterns/*.ts` (one file per path). The co
 ### Editing Solution Walkthroughs
 
 Walkthroughs live in `src/content/solutions/*.ts`, one file per path, keyed by problem slug. The available diagram types are defined in `src/content/solutions/types.ts`, and text fields support `inline code` and **bold**. The set is validated at build time: every problem must have a walkthrough with an idea and at least one step, and every walkthrough must match a problem. Set `videoUrl` on a solution to override the default YouTube search link.
+
+The Python code for each problem lives in `src/content/solutions/code/*.ts`, with the same file layout and slugs. It is validated the same way: every problem needs code, and every snippet must match a problem.
 
 ### Progressive Web App
 

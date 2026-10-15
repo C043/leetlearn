@@ -1,9 +1,10 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, CirclePlay, ExternalLink, Gauge, Lightbulb, MemoryStick, TriangleAlert } from "lucide-react";
+import { ArrowLeft, CirclePlay, Code, ExternalLink, Gauge, Lightbulb, MemoryStick, TriangleAlert } from "lucide-react";
 import { PATTERNS } from "@/content";
-import { getSolution, videoUrlFor } from "@/content/solutions";
+import { getCode, getSolution, videoUrlFor } from "@/content/solutions";
 import DifficultyBadge from "@/components/duolingo/DifficultyBadge";
+import CodeBlock from "@/components/solution/CodeBlock";
 import Visual from "@/components/solution/Visual";
 
 function findProblem(slug: string) {
@@ -46,7 +47,8 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
   const { slug } = await params;
   const found = findProblem(slug);
   const solution = getSolution(slug);
-  if (!found || !solution) notFound();
+  const code = getCode(slug);
+  if (!found || !solution || !code) notFound();
   const { pattern, problem, order } = found;
 
   return (
@@ -119,6 +121,13 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
               </li>
             ))}
           </ol>
+        </section>
+
+        <section className="mt-8">
+          <h2 className="mb-4 flex items-center gap-2 text-xl font-black">
+            <Code className="size-5" /> Code
+          </h2>
+          <CodeBlock code={code} />
         </section>
 
         <section className="mt-8 grid gap-3 sm:grid-cols-2">
