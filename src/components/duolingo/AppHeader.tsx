@@ -16,7 +16,7 @@ export default function AppHeader({
 }) {
   return (
     <header className="sticky top-0 z-40 border-b-2 border-zinc-200 bg-[var(--background)]/90 backdrop-blur dark:border-zinc-800">
-      <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
+      <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-3">
         <Link href="/" className="text-2xl font-black tracking-tight text-green-500">
           LeetLearn
         </Link>

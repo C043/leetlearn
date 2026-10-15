@@ -65,7 +65,7 @@ function PathTile({ pattern, isNext }: { pattern: PatternSummary; isNext: boolea
 export default function PathGrid({ patterns }: { patterns: PatternSummary[] }) {
   const next = nextPathOrder(patterns);
   return (
-    <ul className="grid grid-cols-1 gap-5 min-[420px]:grid-cols-2 lg:grid-cols-3">
+    <ul className="grid grid-cols-1 gap-5 min-[420px]:grid-cols-2">
       {patterns.map((p) => (
         <li key={p.id} className="min-w-0">
           <PathTile pattern={p} isNext={p.order === next} />

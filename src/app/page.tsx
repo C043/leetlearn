@@ -28,7 +28,7 @@ export default async function Home() {
   return (
     <>
       <AppHeader {...header} />
-      <main className="mx-auto max-w-5xl px-4 pb-12 pt-6">
+      <main className="mx-auto max-w-2xl px-4 pb-12 pt-6">
         <ReviewTile count={review.length} nextRotation={nextScheduledRotation().toISOString()} />
         <h1 className="mb-4 mt-8 px-1 text-xs font-extrabold uppercase tracking-wider text-zinc-400">
           Learning paths
