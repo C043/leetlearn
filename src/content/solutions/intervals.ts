@@ -2,7 +2,7 @@ import { defineSolutions } from "./types";
 
 export default defineSolutions({
   "summary-ranges": {
-    idea: "The array is sorted and unique, so a range continues as long as `nums[i] == nums[i-1] + 1`. When the run breaks, emit `\"start->end\"` (or just `\"start\"` for a single number).",
+    idea: "The array is sorted and unique, so a range continues as long as `nums[index + 1] == nums[index] + 1`. When the run breaks, emit `\"start->end\"` (or just `\"start\"` for a single number).",
     steps: [
       {
         text: "`[0,1,2,4,5,7]`:",
@@ -19,7 +19,7 @@ export default defineSolutions({
   },
 
   "teemo-attacking": {
-    idea: "Each attack poisons `[t, t + duration)`. Overlapping poison doesn't stack, so each attack contributes `min(duration, nextAttack - t)`, and the last one contributes the full duration.",
+    idea: "Each attack poisons `[t, t + duration)`. Overlapping poison doesn't stack, so each attack contributes `min(duration, timeSeries[attack + 1] - timeSeries[attack])`, and the last one contributes the full duration.",
     steps: [
       {
         text: "`timeSeries = [1, 2]`, `duration = 2`:",
@@ -66,7 +66,7 @@ export default defineSolutions({
     ],
     time: "O(n log n)",
     space: "O(n) for the output",
-    pitfalls: ["Use `end = max(end, next.end)`, since the next interval may be fully inside."],
+    pitfalls: ["Use `merged[-1][1] = max(merged[-1][1], end)`, since the next interval may be fully inside."],
   },
 
   "insert-interval": {
@@ -136,7 +136,7 @@ export default defineSolutions({
             { start: 2, end: 8, tone: "good" },
             { start: 3, end: 6, tone: "bad" },
           ],
-          caption: "[3,6] ends at 6 ≤ maxEnd 8, so it's covered. 2 remain",
+          caption: "[3,6] ends at 6 ≤ furthest_end 8, so it's covered. 2 remain",
         },
       },
     ],
@@ -164,10 +164,10 @@ export default defineSolutions({
   },
 
   "interval-list-intersections": {
-    idea: "Two pointers, one per list. The overlap of `A[i]` and `B[j]` is `[max(starts), min(ends)]` if non-empty. Then advance whichever interval **ends first**, since it can't intersect anything else.",
+    idea: "Two pointers, one per list. The overlap of `firstList[first]` and `secondList[second]` is `[low, high]` (the later start, the earlier end) if `low <= high`. Then advance whichever interval **ends first**, since it can't intersect anything else.",
     steps: [
       {
-        text: "Blue = A, green = B:",
+        text: "Blue = firstList, green = secondList:",
         visual: {
           kind: "intervals",
           items: [
@@ -178,7 +178,7 @@ export default defineSolutions({
             { start: 13, end: 23 },
             { start: 15, end: 24, tone: "good" },
           ],
-          caption: "First three pairs of A = [[0,2],[5,10],[13,23],[24,25]] and B = [[1,5],[8,12],[15,24],[25,26]]",
+          caption: "First three pairs of firstList = [[0,2],[5,10],[13,23],[24,25]] and secondList = [[1,5],[8,12],[15,24],[25,26]]",
         },
       },
       { text: "Result: `[1,2], [5,5], [8,10], [15,23], [24,24], [25,25]`." },
@@ -212,11 +212,11 @@ export default defineSolutions({
     ],
     time: "O(n + maxLocation)",
     space: "O(maxLocation)",
-    pitfalls: ["Drop-off happens **before** pickup at the same location: subtract at `to`, not `to + 1`."],
+    pitfalls: ["Drop-off happens **before** pickup at the same location: subtract at `end`, not `end + 1`."],
   },
 
   "minimum-interval-to-include-each-query": {
-    idea: "Process **queries in sorted order** (remember original positions). Sort intervals by start and push each with `start ≤ q` into a min-heap keyed by `size`. Pop entries whose `end < q`. The heap top is the smallest interval covering `q`.",
+    idea: "Process **queries in sorted order** (remember original positions). Sort intervals by start and push each with `start <= query` into a min-heap keyed by size. Pop entries whose `end < query`. The heap top is the smallest interval covering `query`.",
     steps: [
       {
         text: "`intervals = [[1,4],[2,4],[3,6],[4,4]]`:",

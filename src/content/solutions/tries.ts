@@ -2,7 +2,7 @@ import { defineSolutions } from "./types";
 
 export default defineSolutions({
   "longest-common-prefix": {
-    idea: "Compare column by column (vertical scanning): take the character at position `i` of the first word and check it in every other word. Stop at the first mismatch or when any word runs out.",
+    idea: "Compare column by column (vertical scanning): take the character at `position` in the first word and check it in every other word. Stop at the first mismatch or when any word runs out.",
     steps: [
       {
         text: "`[\"flower\", \"flow\", \"flight\"]`:",
@@ -39,7 +39,7 @@ export default defineSolutions({
   },
 
   "implement-trie-prefix-tree": {
-    idea: "Each node has up to 26 children and an `isEnd` flag. Words sharing a prefix share the path for that prefix. `insert` creates missing nodes; `search` walks and checks `isEnd`; `startsWith` just checks that the walk succeeds.",
+    idea: "Each node has up to 26 children and an `is_end` flag. Words sharing a prefix share the path for that prefix. `insert` creates missing nodes; `search` walks and checks `is_end`; `startsWith` just checks that the walk succeeds.",
     steps: [
       {
         text: "After inserting `app`, `apple`, `bat` (green = word end):",
@@ -58,7 +58,7 @@ export default defineSolutions({
           },
         },
       },
-      { text: "`search(\"ap\")` is false (the node exists but isn't an end). `startsWith(\"ap\")` is true." },
+      { text: "`search(\"ap\")` is `False` (the node exists but isn't an end). `startsWith(\"ap\")` is `True`." },
     ],
     time: "O(L) per operation",
     space: "O(total characters)",
@@ -134,7 +134,7 @@ export default defineSolutions({
   },
 
   "map-sum-pairs": {
-    idea: "Every trie node stores the **sum of values** of all keys passing through it. On `insert`, compute `delta = val - oldVal(key)` (keep a map of current values) and add `delta` along the path. `sum(prefix)` just walks to the prefix node and reads it.",
+    idea: "Every trie node stores the **sum of values** of all keys passing through it. On `insert`, compute `delta = val - self.values.get(key, 0)` (`self.values` keeps the current value of each key) and add `delta` along the path. `sum(prefix)` just walks to the prefix node and reads it.",
     steps: [
       {
         text: "`insert(\"apple\", 3)` then `insert(\"app\", 2)`:",
@@ -178,7 +178,7 @@ export default defineSolutions({
           caption: "Stream \"…c d\": walk d → c, reaching a word end, so true",
         },
       },
-      { text: "Keep only the last `maxWordLength` characters of the stream." },
+      { text: "Keep only the last `longest_word` characters of the stream." },
     ],
     time: "O(maxLen) per query",
     space: "O(total characters)",

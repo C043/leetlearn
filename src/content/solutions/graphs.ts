@@ -97,14 +97,14 @@ export default defineSolutions({
     idea: "Traverse the graph (DFS or BFS) while keeping a map **original → clone**. The map does two jobs: it's the visited set, and it lets you link a neighbor's clone even if the neighbor was created earlier (handles cycles).",
     steps: [
       {
-        text: "`adj = [[2,4],[1,3],[2,4],[1,3]]`, a 4-cycle.",
+        text: "`adjList = [[2,4],[1,3],[2,4],[1,3]]`, a 4-cycle.",
         visual: {
           kind: "graph",
           nodes: [{ id: "1", x: 0, y: 0 }, { id: "2", x: 1, y: 0 }, { id: "3", x: 1, y: 1 }, { id: "4", x: 0, y: 1 }],
           edges: [["1", "2"], ["2", "3"], ["3", "4"], ["4", "1"]],
         },
       },
-      { text: "`clone(node)`: if it's in the map, return the stored copy. Otherwise create a copy, **store it first**, then set `copy.neighbors = node.neighbors.map(clone)`." },
+      { text: "`clone(original)`: if it's in `clones`, return the stored copy. Otherwise create a copy, **store it first**, then set `copy.neighbors = [clone(neighbor) for neighbor in original.neighbors]`." },
     ],
     time: "O(V + E)",
     space: "O(V)",
@@ -115,7 +115,7 @@ export default defineSolutions({
     idea: "Courses with prerequisites form a directed graph. You can finish all courses iff it has **no cycle**. Kahn's algorithm: repeatedly take courses with in-degree 0; if you can't process all `n`, there's a cycle.",
     steps: [
       {
-        text: "Edge `a → b` means take `a` before `b`. Start with every in-degree-0 course in a queue.",
+        text: "Edge `prerequisite → course` means take `prerequisite` before `course`. Start with every in-degree-0 course in a queue.",
         visual: {
           kind: "graph",
           directed: true,
@@ -125,7 +125,7 @@ export default defineSolutions({
         },
       },
       {
-        text: "Pop a course, decrement its neighbors' in-degrees, and enqueue any that hit 0. A cycle keeps every node in it above 0.",
+        text: "Pop a course, decrement the `indegree` of every course that follows it, and enqueue any that hit 0. A cycle keeps every node in it above 0.",
         visual: {
           kind: "graph",
           directed: true,
@@ -137,7 +137,7 @@ export default defineSolutions({
     ],
     time: "O(V + E)",
     space: "O(V + E)",
-    pitfalls: ["Input `[a, b]` means **b → a** (b is the prerequisite)."],
+    pitfalls: ["Input `[course, prerequisite]` means **prerequisite → course**."],
   },
 
   "course-schedule-ii": {
@@ -187,7 +187,7 @@ export default defineSolutions({
           tones: { good: [[0, 4], [1, 3], [1, 4], [2, 2], [3, 0], [3, 1], [4, 0]] },
         },
       },
-      { text: "Two visited matrices, `pac` and `atl`. Seed each from its edges and expand to `heights[nr][nc] >= heights[r][c]`." },
+      { text: "Two visited sets, `pacific` and `atlantic`. Seed each from its edges and expand to `heights[next_row][next_column] >= heights[row][column]`." },
     ],
     time: "O(m · n)",
     space: "O(m · n)",
@@ -213,7 +213,7 @@ export default defineSolutions({
           caption: "hit → hot → dot → dog → cog: 5 words",
         },
       },
-      { text: "Remove words from the dictionary when you enqueue them; that's the visited set. Return `level` when you pop `endWord`, or 0 if BFS ends." },
+      { text: "Remove words from the dictionary when you enqueue them; that's the visited set. Return `steps` when you pop `endWord`, or 0 if BFS ends." },
     ],
     time: "O(N · L · 26)",
     space: "O(N · L)",

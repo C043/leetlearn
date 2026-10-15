@@ -9,7 +9,7 @@ export default defineSolutions({
         text: "Swap `root.left` and `root.right`, recurse into both. The result is a left-right mirror image.",
         visual: { kind: "tree", values: [4, 7, 2, 9, 6, 3, 1], tones: { accent: [1, 2] } },
       },
-      { text: "Base case: `null` returns `null`. BFS with a queue works equally well." },
+      { text: "Base case: `None` returns `None`. BFS with a queue works equally well." },
     ],
     time: "O(n)",
     space: "O(h) recursion",
@@ -19,10 +19,10 @@ export default defineSolutions({
     idea: "Two trees are identical iff their roots match **and** their left subtrees are identical **and** their right subtrees are identical. Check structure and values in one recursive pass.",
     steps: [
       {
-        text: "Both `null` means true. Exactly one `null`, or different values, means false.",
+        text: "Both `None` means `True`. Exactly one `None`, or different values, means `False`.",
         visual: { kind: "tree", values: [1, 2, 3], tones: { good: [0, 1, 2] }, caption: "p and q = [1,2,3], so they're the same" },
       },
-      { text: "Otherwise return `same(p.left, q.left) && same(p.right, q.right)`." },
+      { text: "Otherwise return `p.val == q.val and self.isSameTree(p.left, q.left) and self.isSameTree(p.right, q.right)`." },
     ],
     time: "O(n)",
     space: "O(h)",
@@ -48,12 +48,12 @@ export default defineSolutions({
         text: "Checking only parent/child misses this: `3` is a valid left child of `6`, but it sits in `5`'s **right** subtree, so it must be `> 5`.",
         visual: { kind: "tree", values: [5, 4, 6, null, null, 3, 7], tones: { bad: [5] }, caption: "Not a BST: 3 violates the bound (5, 6)" },
       },
-      { text: "`valid(node, lo, hi)`: `lo < node.val < hi`, then `valid(left, lo, node.val) && valid(right, node.val, hi)`. Start with `(-∞, +∞)`." },
+      { text: "`valid(node, low, high)`: `low < node.val < high`, then `valid(node.left, low, node.val) and valid(node.right, node.val, high)`. Start with `(-∞, +∞)`." },
       { text: "Alternative: an inorder traversal of a BST is strictly increasing, so check each value against the previous one." },
     ],
     time: "O(n)",
     space: "O(h)",
-    pitfalls: ["Node values can be `INT_MIN`/`INT_MAX`, so use `null`/`long` bounds, not int sentinels."],
+    pitfalls: ["Node values can be `INT_MIN`/`INT_MAX`, so don't use int sentinels as bounds; `float(\"-inf\")` and `float(\"inf\")` are safe."],
   },
 
   "lowest-common-ancestor-of-a-binary-tree": {
@@ -75,10 +75,10 @@ export default defineSolutions({
   },
 
   "path-sum-iii": {
-    idea: "Prefix sums on a tree path: a downward path from `a` to `b` sums to `target` iff `prefix(b) - prefix(a's parent) = target`. While doing DFS, keep a map of prefix-sum counts **along the current root path**, and add `count[cur - target]` at every node.",
+    idea: "Prefix sums on a tree path: a downward path from `a` to `b` sums to `targetSum` iff `prefix(b) - prefix(a's parent) = targetSum`. While doing DFS, keep a map of prefix-sum counts **along the current root path**, and add `counts[prefix - targetSum]` at every node.",
     steps: [
       {
-        text: "`target = 8`. Three paths qualify: `5→3`, `5→2→1`, `-3→11`.",
+        text: "`targetSum = 8`. Three paths qualify: `5→3`, `5→2→1`, `-3→11`.",
         visual: {
           kind: "tree",
           values: [10, 5, -3, 3, 2, null, 11, 3, -2, null, 1],
@@ -86,14 +86,14 @@ export default defineSolutions({
           caption: "At node 3 (prefix 18): 18 − 8 = 10 is in the map (root's prefix), so +1",
         },
       },
-      { text: "Seed `count[0] = 1` (a path starting at the root). After visiting both children, **decrement** the current prefix so sibling branches don't see it." },
+      { text: "Seed `counts[0] = 1` (a path starting at the root). After visiting both children, **decrement** the current prefix so sibling branches don't see it." },
     ],
     time: "O(n)",
     space: "O(h)",
   },
 
   "count-good-nodes-in-binary-tree": {
-    idea: "A node is good if nothing on its root path is larger. DFS while carrying the **maximum value seen so far**: count the node if `node.val >= maxSoFar`, then pass `max(maxSoFar, node.val)` down.",
+    idea: "A node is good if nothing on its root path is larger. DFS while carrying the **maximum value seen so far**: count the node if `node.val >= largest_so_far`, then pass `max(largest_so_far, node.val)` down.",
     steps: [
       {
         text: "Green nodes are good, red ones aren't.",
@@ -128,10 +128,10 @@ export default defineSolutions({
   },
 
   "unique-binary-search-trees": {
-    idea: "Pick each value `i` as the root: values `< i` form the left subtree (`i - 1` nodes) and values `> i` the right (`n - i` nodes). The shapes are independent, so multiply: `G(n) = Σ G(i-1) · G(n-i)`. These are the Catalan numbers.",
+    idea: "Pick each value `root` as the root: values `< root` form the left subtree (`root - 1` nodes) and values `> root` the right (`nodes - root` nodes). The shapes are independent, so multiply: `tree_count[nodes] = Σ tree_count[root - 1] · tree_count[nodes - root]`. These are the Catalan numbers.",
     steps: [
       {
-        text: "`n = 3`: root 1 gives `G(0)·G(2) = 2`; root 2 gives `G(1)·G(1) = 1`; root 3 gives `G(2)·G(0) = 2`. Total 5.",
+        text: "`n = 3`: root 1 gives `tree_count[0] · tree_count[2] = 2`; root 2 gives `tree_count[1] · tree_count[1] = 1`; root 3 gives `tree_count[2] · tree_count[0] = 2`. Total 5.",
         visual: {
           kind: "ntree",
           root: {
@@ -145,8 +145,8 @@ export default defineSolutions({
         },
       },
       {
-        text: "Fill a DP table bottom-up from `G(0) = G(1) = 1`.",
-        visual: { kind: "grid", colLabels: ["0", "1", "2", "3", "4", "5"], rowLabels: ["G"], rows: [[1, 1, 2, 5, 14, 42]], tones: { good: [[0, 3]] } },
+        text: "Fill the table bottom-up from `tree_count[0] = 1`.",
+        visual: { kind: "grid", colLabels: ["0", "1", "2", "3", "4", "5"], rowLabels: ["tree_count"], rows: [[1, 1, 2, 5, 14, 42]], tones: { good: [[0, 3]] } },
       },
     ],
     time: "O(n²)",
@@ -154,7 +154,7 @@ export default defineSolutions({
   },
 
   "binary-tree-maximum-path-sum": {
-    idea: "At each node, two different things matter. (1) The best path that **bends** here: `val + max(0, L) + max(0, R)`; update the global answer with it. (2) What the node can **offer its parent**, a single straight branch: `val + max(0, L, R)`.",
+    idea: "At each node, two different things matter. With `left` and `right` as the child gains clipped at 0: (1) the best path that **bends** here is `node.val + left + right`; update `best` with it. (2) What the node can **offer its parent**, a single straight branch: `node.val + max(left, right)`.",
     steps: [
       {
         text: "Post-order DFS. Negative branch gains are clipped to 0 (just don't take them).",
@@ -165,7 +165,7 @@ export default defineSolutions({
           caption: "Best path 15 → 20 → 7 = 42 bends at 20 and doesn't include the root",
         },
       },
-      { text: "At 20: gain(left) = 15, gain(right) = 7, so update the answer with `20+15+7 = 42` and return `20 + 15 = 35` to the parent." },
+      { text: "At 20: gain(left) = 15, gain(right) = 7, so update `best` with `20+15+7 = 42` and return `20 + 15 = 35` to the parent." },
     ],
     time: "O(n)",
     space: "O(h)",

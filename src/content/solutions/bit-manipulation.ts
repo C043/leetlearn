@@ -38,7 +38,7 @@ export default defineSolutions({
   },
 
   "counting-bits": {
-    idea: "`i >> 1` is `i` without its last bit, and we've already computed it. So `bits[i] = bits[i >> 1] + (i & 1)`.",
+    idea: "`number >> 1` is `number` without its last bit, and we've already computed it. So `bits[number] = bits[number >> 1] + (number & 1)`.",
     steps: [
       {
         text: "`n = 5`:",
@@ -51,7 +51,7 @@ export default defineSolutions({
           caption: "bits[5] = bits[2] + 1 = 2",
         },
       },
-      { text: "Alternative: `bits[i] = bits[i & (i - 1)] + 1` (drop the lowest set bit)." },
+      { text: "Alternative: `bits[number] = bits[number & (number - 1)] + 1` (drop the lowest set bit)." },
     ],
     time: "O(n)",
     space: "O(n) for the output",
@@ -61,7 +61,7 @@ export default defineSolutions({
     idea: "Pop bits off the right of `n` and push them onto the right of the result, 32 times. The first bit popped ends up as the most significant.",
     steps: [
       {
-        text: "Each step: `res = (res << 1) | (n & 1)`, then `n >>= 1`. Shown with 8 bits for readability:",
+        text: "Each step: `result = (result << 1) | (n & 1)`, then `n >>= 1`. Shown with 8 bits for readability:",
         visual: {
           kind: "grid",
           rowLabels: ["n", "reversed"],
@@ -146,7 +146,7 @@ export default defineSolutions({
           caption: "110… starts 2 bytes, 10… continues, 0… is a single byte: valid",
         },
       },
-      { text: "Check with masks: `(b >> 5) == 0b110`, `(b >> 4) == 0b1110`, `(b >> 3) == 0b11110`, `(b >> 6) == 0b10`." },
+      { text: "Check with masks: `byte >> 5 == 0b110`, `byte >> 4 == 0b1110`, `byte >> 3 == 0b11110`, `byte >> 6 == 0b10`." },
     ],
     time: "O(n)",
     space: "O(1)",
@@ -154,7 +154,7 @@ export default defineSolutions({
   },
 
   "xor-queries-of-a-subarray": {
-    idea: "Prefix XOR works like prefix sums: `p[i] = arr[0] ^ … ^ arr[i-1]`. Since `x ^ x = 0`, the XOR of `arr[l..r]` is `p[r+1] ^ p[l]`.",
+    idea: "Prefix XOR works like prefix sums: `prefix[index] = arr[0] ^ … ^ arr[index - 1]`. Since `x ^ x = 0`, the XOR of `arr[start..end]` is `prefix[end + 1] ^ prefix[start]`.",
     steps: [
       {
         text: "`arr = [1,3,4,8]`:",
@@ -164,7 +164,7 @@ export default defineSolutions({
           rowLabels: ["arr", "prefix"],
           rows: [[1, 3, 4, 8, ""], [0, 1, 2, 6, 14]],
           tones: { accent: [[1, 1], [1, 3]] },
-          caption: "Query [1,2] = p[3] ^ p[1] = 6 ^ 1 = 7",
+          caption: "Query [1,2] = prefix[3] ^ prefix[1] = 6 ^ 1 = 7",
         },
       },
     ],
@@ -186,7 +186,7 @@ export default defineSolutions({
           caption: "n = 6 (110) is at position 4, so 4 operations",
         },
       },
-      { text: "Loop: `ans = 0; while n: ans ^= n; n >>= 1`. Recursive view: `f(n) = 2^(k+1) - 1 - f(n ^ 2^k)` with `k` the highest set bit." },
+      { text: "Loop: `result = 0; while n: result ^= n; n >>= 1`. Recursive view: `f(n) = 2^(k+1) - 1 - f(n ^ 2^k)` with `k` the highest set bit." },
     ],
     time: "O(log n)",
     space: "O(1)",

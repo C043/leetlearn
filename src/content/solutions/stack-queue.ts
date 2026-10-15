@@ -13,18 +13,18 @@ export default defineSolutions({
     ],
     time: "O(n)",
     space: "O(n)",
-    pitfalls: ["`\"((\"` passes every closer check but leaves items on the stack, so check `stack.isEmpty()` at the end."],
+    pitfalls: ["`\"((\"` passes every closer check but leaves items on the stack, so check `not stack` at the end."],
   },
 
   "implement-queue-using-stacks": {
-    idea: "Two stacks: `in` receives pushes; `out` serves pops. When `out` is empty, pour all of `in` into it, which **reverses** the order and puts the oldest element on top. Each element moves at most once, so operations are amortized O(1).",
+    idea: "Two stacks: `inbox` receives pushes; `outbox` serves pops. When `outbox` is empty, pour all of `inbox` into it, which **reverses** the order and puts the oldest element on top. Each element moves at most once, so operations are amortized O(1).",
     steps: [
-      { text: "`push(1), push(2), push(3)` all go to `in`.", visual: { kind: "stack", items: [1, 2, 3], caption: "in" } },
+      { text: "`push(1), push(2), push(3)` all go to `inbox`.", visual: { kind: "stack", items: [1, 2, 3], caption: "inbox" } },
       {
-        text: "`pop()`: `out` is empty, so move everything over. Now the front of the queue (1) is on top.",
-        visual: { kind: "stack", items: [3, 2, 1], tones: { good: [2] }, caption: "out: pop returns 1" },
+        text: "`pop()`: `outbox` is empty, so move everything over. Now the front of the queue (1) is on top.",
+        visual: { kind: "stack", items: [3, 2, 1], tones: { good: [2] }, caption: "outbox: pop returns 1" },
       },
-      { text: "Only refill `out` when it's empty; otherwise you'd break the order." },
+      { text: "Only refill `outbox` when it's empty; otherwise you'd break the order." },
     ],
     time: "Amortized O(1) per op",
     space: "O(n)",
@@ -34,16 +34,16 @@ export default defineSolutions({
     idea: "Keep a **monotonic decreasing stack** of indices still waiting for a warmer day. When a warmer temperature arrives, it's the answer for every colder index on top, so pop them and record the distance.",
     steps: [
       {
-        text: "`temps = [73,74,75,71,69,72,76,73]`. At `i = 5` (72), the stack holds days still waiting:",
+        text: "`temperatures = [73,74,75,71,69,72,76,73]`. At `day = 5` (72), the stack holds days still waiting:",
         visual: {
           kind: "stack",
           items: ["75 · i=2", "71 · i=3", "69 · i=4"],
           tones: { bad: [1, 2] },
-          caption: "72 is warmer than 69 and 71, so pop them: ans[4] = 1, ans[3] = 2",
+          caption: "72 is warmer than 69 and 71, so pop them: result[4] = 1, result[3] = 2",
         },
       },
       {
-        text: "Push `i`. Indices left on the stack at the end never get a warmer day (answer 0).",
+        text: "Push `day`. Indices left on the stack at the end never get a warmer day (answer 0).",
         visual: { kind: "array", values: [1, 1, 4, 2, 1, 1, 0, 0], caption: "Answer" },
       },
     ],
@@ -52,7 +52,7 @@ export default defineSolutions({
   },
 
   "next-greater-element-ii": {
-    idea: "Same monotonic stack as Daily Temperatures, but the array is circular. Simulate wrapping by iterating `i` from `0` to `2n - 1` and using `nums[i % n]`. Push indices only during the first lap.",
+    idea: "Same monotonic stack as Daily Temperatures, but the array is circular. Simulate wrapping by iterating `step` from `0` to `2 * length - 1` and using `nums[step % length]`. Push indices only during the first lap.",
     steps: [
       {
         text: "`nums = [1,2,3,4,3]`. The last `3` only finds `4` by wrapping around.",
@@ -79,8 +79,8 @@ export default defineSolutions({
         text: "`[10, 2, -5]`: push 10 and 2. Then `-5` arrives.",
         visual: { kind: "stack", items: [10, 2], tones: { bad: [1] }, caption: "|-5| > 2, so 2 explodes; |-5| < 10, so -5 explodes" },
       },
-      { text: "While `top > 0 && cur < 0`: if `top < |cur|`, pop and continue; if equal, pop and drop `cur`; if bigger, drop `cur`." },
-      { text: "If `cur` survives, push it. The stack is the answer.", visual: { kind: "stack", items: [10], tones: { good: [0] } } },
+      { text: "While `stack[-1] > 0 and asteroid < 0`: if `stack[-1] < -asteroid`, pop and continue; if equal, pop both; if bigger, the incoming `asteroid` explodes." },
+      { text: "If `asteroid` survives, push it. The stack is the answer.", visual: { kind: "stack", items: [10], tones: { good: [0] } } },
     ],
     time: "O(n)",
     space: "O(n)",
@@ -105,7 +105,7 @@ export default defineSolutions({
   },
 
   "decode-string": {
-    idea: "Nested brackets mean you must pause the outer string while building the inner one. On `[`, push `(currentString, repeatCount)` and start fresh. On `]`, pop and set `current = prev + current * count`.",
+    idea: "Nested brackets mean you must pause the outer string while building the inner one. On `[`, push `(current, count)` and start fresh. On `]`, pop `(before, repeat)` and set `current = before + current * repeat`.",
     steps: [
       {
         text: "`\"3[a2[c]]\"`: after reading `3[a2[`, the stack remembers the outer contexts.",
@@ -116,7 +116,7 @@ export default defineSolutions({
     ],
     time: "O(output length)",
     space: "O(output length)",
-    pitfalls: ["Counts can be multi-digit (`\"12[a]\"`), so build `k = k * 10 + digit`."],
+    pitfalls: ["Counts can be multi-digit (`\"12[a]\"`), so build `count = count * 10 + int(character)`."],
   },
 
   "remove-k-digits": {
@@ -140,14 +140,14 @@ export default defineSolutions({
         text: "`arr = [3,1,2,4]`:",
         visual: {
           kind: "grid",
-          colLabels: ["value", "left", "right", "contrib"],
+          colLabels: ["value", "left", "right", "contribution"],
           rows: [[3, 1, 1, 3], [1, 2, 3, 6], [2, 1, 2, 4], [4, 1, 1, 4]],
           tones: { good: [[1, 3]] },
           caption: "1 is the min of 2 × 3 = 6 subarrays. Total = 17",
         },
       },
       { text: "Use strict `<` on one side and `≤` on the other so equal values aren't double-counted." },
-      { text: "Answer = `Σ arr[i] · left[i] · right[i]` mod `1e9 + 7`." },
+      { text: "Answer = `Σ arr[index] · left[index] · right[index]` mod `MODULO` (`10**9 + 7`)." },
     ],
     time: "O(n)",
     space: "O(n)",
@@ -157,7 +157,7 @@ export default defineSolutions({
     idea: "For each bar, the widest rectangle at its height spans until a **shorter bar** on each side. A monotonic increasing stack finds this: when a shorter bar arrives, every taller bar popped now knows its right boundary, and its left boundary is the new stack top.",
     steps: [
       {
-        text: "When popping height `h` at index `i`, the width is `i - stack.top - 1` (or `i` if the stack is empty).",
+        text: "When popping `height` at `index`, the width is `index - stack[-1] - 1` (or `index` if the stack is empty).",
         visual: {
           kind: "bars",
           values: [2, 1, 5, 6, 2, 3],

@@ -38,15 +38,15 @@ export default defineSolutions({
   },
 
   "jump-game": {
-    idea: "Track the **furthest index reachable** so far. Scanning left to right, if the current index is beyond it, you're stuck. Otherwise extend it with `i + nums[i]`.",
+    idea: "Track the **furthest index reachable** so far. Scanning left to right, if the current index is beyond it, you're stuck. Otherwise extend it with `index + jump`.",
     steps: [
       {
         text: "`[2,3,1,1,4]`: from index 1 you can reach index 4.",
-        visual: { kind: "array", values: [2, 3, 1, 1, 4], tones: { good: [1, 4] }, caption: "reach = max(reach, i + nums[i]) = 4 ≥ last, so true" },
+        visual: { kind: "array", values: [2, 3, 1, 1, 4], tones: { good: [1, 4] }, caption: "furthest = max(furthest, index + jump) = 4 ≥ last index, so True" },
       },
       {
         text: "`[3,2,1,0,4]`: every path lands on the `0` at index 3.",
-        visual: { kind: "array", values: [3, 2, 1, 0, 4], tones: { bad: [3], muted: [4] }, caption: "reach stays 3, and i = 4 > reach, so false" },
+        visual: { kind: "array", values: [3, 2, 1, 0, 4], tones: { bad: [3], muted: [4] }, caption: "furthest stays 3, and index = 4 > furthest, so False" },
       },
     ],
     time: "O(n)",
@@ -54,7 +54,7 @@ export default defineSolutions({
   },
 
   "jump-game-ii": {
-    idea: "Think BFS by layers: all indices reachable with `j` jumps form a contiguous range. Scan the current range while recording the furthest next reach. When you hit the range's end, take a jump and move to the next range.",
+    idea: "Think BFS by layers: all indices reachable with the same number of jumps form a contiguous range. Scan the current range while recording the furthest next reach. When you hit the range's end, take a jump and move to the next range.",
     steps: [
       {
         text: "`[2,3,1,1,4]`:",
@@ -68,14 +68,14 @@ export default defineSolutions({
           caption: "The last index is in the 2-jump range",
         },
       },
-      { text: "`for i in 0..n-2`: `far = max(far, i + nums[i])`; if `i == end`: `jumps++`, `end = far`." },
+      { text: "`for index in range(len(nums) - 1)`: `furthest = max(furthest, index + nums[index])`; if `index == end`: `jumps += 1`, `end = furthest`." },
     ],
     time: "O(n)",
     space: "O(1)",
   },
 
   "gas-station": {
-    idea: "If total gas ≥ total cost, a solution exists. To find the start: run a tank from station 0. Whenever it goes **negative** at station `i`, no station between the current start and `i` can work, so restart from `i + 1`.",
+    idea: "If total gas ≥ total cost, a solution exists. To find the start: run a tank from station 0. Whenever it goes **negative** at `station`, no station between the current `start` and `station` can work, so restart from `station + 1`.",
     steps: [
       {
         text: "`gas - cost` per station:",
@@ -94,7 +94,7 @@ export default defineSolutions({
   },
 
   "partition-labels": {
-    idea: "Record each letter's **last occurrence**. Grow the current part's end to cover the last occurrence of every letter inside it. When `i` reaches that end, the part is closed.",
+    idea: "Record each letter's **last occurrence**. Grow the current part's end to cover the last occurrence of every letter inside it. When `index` reaches that end, the part is closed.",
     steps: [
       {
         text: "`\"ababcbacadefegdehijhklij\"`:",
@@ -108,7 +108,7 @@ export default defineSolutions({
           caption: "Each letter appears in exactly one part",
         },
       },
-      { text: "`end = max(end, last[s[i]])`; when `i == end`, push `end - start + 1` and set `start = i + 1`." },
+      { text: "`end = max(end, last[letter])`; when `index == end`, append `end - start + 1` and set `start = index + 1`." },
     ],
     time: "O(n)",
     space: "O(26)",
@@ -118,10 +118,10 @@ export default defineSolutions({
     idea: "Kadane's algorithm: at each element, either **extend** the current subarray or **start fresh** here, whichever is larger. A negative running sum only drags things down, so drop it.",
     steps: [
       {
-        text: "`cur = max(x, cur + x)`; `best = max(best, cur)`.",
+        text: "`current = max(number, current + number)`; `best = max(best, current)`.",
         visual: {
           kind: "grid",
-          rowLabels: ["nums", "cur"],
+          rowLabels: ["nums", "current"],
           rows: [[-2, 1, -3, 4, -1, 2, 1, -5, 4], [-2, 1, -2, 4, 3, 5, 6, 1, 5]],
           tones: { good: [[0, 3], [0, 4], [0, 5], [0, 6], [1, 6]] },
           caption: "Best = 6 from [4, -1, 2, 1]",
@@ -134,7 +134,7 @@ export default defineSolutions({
   },
 
   "hand-of-straights": {
-    idea: "The **smallest** remaining card must start a group, since nothing smaller exists to precede it. So repeatedly take the smallest card `x` and consume `x, x+1, …, x+k-1`. Fail if any is missing.",
+    idea: "The **smallest** remaining card must start a group, since nothing smaller exists to precede it. So repeatedly take the smallest card `value` and consume `value, value + 1, …, value + groupSize - 1`. Fail if any is missing.",
     steps: [
       {
         text: "`hand = [1,2,3,6,2,3,4,7,8]`, `groupSize = 3`. Groups formed:",
@@ -146,7 +146,7 @@ export default defineSolutions({
           caption: "Start at 1, then 2, then 6, so true",
         },
       },
-      { text: "Use a sorted map of counts (or sort the unique keys). Return false early if `n % groupSize != 0`." },
+      { text: "Use a sorted map of counts (or sort the unique keys). Return `False` early if `len(hand) % groupSize != 0`." },
     ],
     time: "O(n log n)",
     space: "O(n)",

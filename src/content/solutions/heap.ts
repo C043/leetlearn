@@ -37,7 +37,7 @@ export default defineSolutions({
       },
       {
         text: "Quickselect view: in sorted order the answer sits at index `n - k = 4`.",
-        visual: { kind: "array", values: [1, 2, 3, 4, 5, 6], tones: { good: [4] }, pointers: [{ at: 4, label: "n − k", tone: "good" }] },
+        visual: { kind: "array", values: [1, 2, 3, 4, 5, 6], tones: { good: [4] }, pointers: [{ at: 4, label: "len(nums) − k", tone: "good" }] },
       },
     ],
     time: "O(n log k) heap / O(n) avg quickselect",
@@ -46,13 +46,13 @@ export default defineSolutions({
   },
 
   "top-k-frequent-elements": {
-    idea: "Count frequencies with a hash map. Then either keep a size-k min-heap keyed by count, or use **bucket sort**: frequencies are at most `n`, so put each number in `bucket[count]` and read buckets from high to low.",
+    idea: "Count frequencies with a hash map. Then either keep a size-k min-heap keyed by count, or use **bucket sort**: frequencies are at most `n`, so put each number in `buckets[count]` and read buckets from high to low.",
     steps: [
       {
         text: "`[1,1,1,2,2,3]`: counts `{1:3, 2:2, 3:1}`. Bucket by frequency:",
         visual: {
           kind: "grid",
-          rowLabels: ["freq 3", "freq 2", "freq 1"],
+          rowLabels: ["count 3", "count 2", "count 1"],
           rows: [[1], [2], [3]],
           tones: { good: [[0, 0], [1, 0]] },
           caption: "Read from the top until k = 2 numbers are collected: [1, 2]",
@@ -83,7 +83,7 @@ export default defineSolutions({
   },
 
   "task-scheduler": {
-    idea: "The most frequent task dictates the layout. Its copies split time into `maxFreq - 1` frames of length `n + 1`, plus a final frame holding every task tied for max. Answer = `max(len(tasks), (maxFreq - 1)(n + 1) + countMax)`.",
+    idea: "The most frequent task dictates the layout. Its copies split time into `highest_frequency - 1` frames of length `n + 1`, plus a final frame holding every task tied for the highest count (`tasks_with_highest`). Answer = `max(len(tasks), (highest_frequency - 1) * (n + 1) + tasks_with_highest)`.",
     steps: [
       {
         text: "`tasks = AAABBB`, `n = 2`. Frames:",
@@ -121,7 +121,7 @@ export default defineSolutions({
   },
 
   "reorganize-string": {
-    idea: "It's impossible exactly when some letter appears more than `⌈n / 2⌉` times. Otherwise, place letters at **even indices first** (most frequent letter first), then odd indices. No two equal letters end up adjacent.",
+    idea: "It's impossible exactly when some letter appears more than `(length + 1) // 2` times. Otherwise, place letters at **even indices first** (most frequent letter first), then odd indices. No two equal letters end up adjacent.",
     steps: [
       {
         text: "`\"aaabbc\"`: `a` (×3) fills indices 0, 2, 4; then `b` continues at 1, 3; `c` at 5.",
@@ -157,13 +157,13 @@ export default defineSolutions({
   },
 
   "find-median-from-data-stream": {
-    idea: "Split the numbers into two halves: a **max-heap** `low` for the smaller half and a **min-heap** `high` for the larger half, with sizes equal or `low` one bigger. The median is `low.top`, or the average of both tops.",
+    idea: "Split the numbers into two halves: a **max-heap** `low` for the smaller half and a **min-heap** `high` for the larger half, with sizes equal or `low` one bigger. The median is the top of `low` (`-self.low[0]`, stored negated), or the average of both tops.",
     steps: [
       {
         text: "After adding 1..5: the low half has max 3 on top; the high half has min 4 on top.",
         visual: { kind: "array", values: [1, 2, 3, "|", 4, 5], indices: false, tones: { accent: [0, 1, 2], good: [4, 5], muted: [3] }, caption: "low (max-heap) | high (min-heap): median = 3" },
       },
-      { text: "`addNum`: push to `low`, move `low.top` to `high` (keeps the order), and if `high` is larger, move its top back to `low`." },
+      { text: "`addNum`: push to `low`, move the top of `low` to `high` (keeps the order), and if `high` is larger, move its top back to `low`." },
     ],
     time: "O(log n) add, O(1) median",
     space: "O(n)",

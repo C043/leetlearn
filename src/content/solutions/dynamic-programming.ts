@@ -13,24 +13,24 @@ export default defineSolutions({
           caption: "ways(5) = ways(4) + ways(3) = 5 + 3 = 8",
         },
       },
-      { text: "Only the last two values are needed, so keep two variables instead of an array." },
+      { text: "Only the last two values are needed, so keep two variables (`previous`, `current`) instead of an array." },
     ],
     time: "O(n)",
     space: "O(1)",
   },
 
   "min-cost-climbing-stairs": {
-    idea: "Let `dp[i]` = cheapest cost to **stand on** step `i` (the top is `i = n`). You arrive from `i-1` paying `cost[i-1]`, or from `i-2` paying `cost[i-2]`. Steps 0 and 1 are free starting points.",
+    idea: "Let `cheapest[step]` = cheapest cost to **stand on** that step (the top is `step = len(cost)`). You arrive from `step - 1` paying `cost[step - 1]`, or from `step - 2` paying `cost[step - 2]`. Steps 0 and 1 are free starting points.",
     steps: [
       {
         text: "`cost = [10, 15, 20]`:",
         visual: {
           kind: "grid",
           colLabels: ["0", "1", "2", "top"],
-          rowLabels: ["cost", "dp"],
+          rowLabels: ["cost", "cheapest"],
           rows: [[10, 15, 20, "-"], [0, 0, 10, 15]],
           tones: { good: [[1, 3]], accent: [[0, 1]] },
-          caption: "dp[3] = min(dp[2] + 20, dp[1] + 15) = 15",
+          caption: "cheapest[3] = min(cheapest[2] + 20, cheapest[1] + 15) = 15",
         },
       },
     ],
@@ -39,13 +39,13 @@ export default defineSolutions({
   },
 
   "house-robber": {
-    idea: "At house `i`, either **skip** it (keep the best up to `i-1`) or **rob** it (its money plus the best up to `i-2`). `dp[i] = max(dp[i-1], dp[i-2] + nums[i])`.",
+    idea: "At each house, either **skip** it (keep `one_back`, the best up to the previous house) or **rob** it (its `money` plus `two_back`, the best up to two houses back): `one_back = max(one_back, two_back + money)`.",
     steps: [
       {
         text: "`nums = [2,7,9,3,1]`:",
         visual: {
           kind: "grid",
-          rowLabels: ["nums", "dp"],
+          rowLabels: ["nums", "best"],
           rows: [[2, 7, 9, 3, 1], [2, 7, 11, 11, 12]],
           tones: { good: [[0, 0], [0, 2], [0, 4], [1, 4]] },
           caption: "Rob houses 0, 2, 4: 2 + 9 + 1 = 12",
@@ -57,19 +57,19 @@ export default defineSolutions({
   },
 
   "coin-change": {
-    idea: "Unbounded knapsack: `dp[a]` = fewest coins summing to `a`. For each amount, try every coin as the **last** coin used: `dp[a] = min(dp[a - c] + 1)`.",
+    idea: "Unbounded knapsack: `fewest[value]` = fewest coins summing to `value`. For each value, try every coin as the **last** coin used: `fewest[value] = min(fewest[value - coin] + 1)`.",
     steps: [
       {
-        text: "`coins = [1,2,5]`, `amount = 11`. `dp[0] = 0`, everything else starts at ∞.",
+        text: "`coins = [1,2,5]`, `amount = 11`. `fewest[0] = 0`, everything else starts at `IMPOSSIBLE` (`amount + 1`, more coins than could ever be needed).",
         visual: {
           kind: "grid",
           colLabels: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"],
           rows: [[0, 1, 1, 2, 2, 1, 2, 2, 3, 3, 2, 3]],
           tones: { accent: [[0, 6], [0, 10]], good: [[0, 11]] },
-          caption: "dp[11] = min(dp[10], dp[9], dp[6]) + 1 = 3, e.g. 5 + 5 + 1",
+          caption: "fewest[11] = min(fewest[10], fewest[9], fewest[6]) + 1 = 3, e.g. 5 + 5 + 1",
         },
       },
-      { text: "If `dp[amount]` is still ∞ at the end, return `-1`." },
+      { text: "If `fewest[amount]` is still `IMPOSSIBLE` at the end, return `-1`." },
     ],
     time: "O(amount · coins)",
     space: "O(amount)",
@@ -77,13 +77,13 @@ export default defineSolutions({
   },
 
   "longest-increasing-subsequence": {
-    idea: "O(n²) DP: `dp[i]` = longest increasing subsequence ending at `i`. For the O(n log n) version, keep `tails`, where `tails[k]` is the **smallest possible tail** of an increasing subsequence of length `k+1`. Each number replaces the first tail ≥ it (binary search), or extends the list.",
+    idea: "O(n²) DP: `longest[index]` = longest increasing subsequence ending at `index`. For the O(n log n) version, keep `tails`, where `tails[length]` is the **smallest possible tail** of an increasing subsequence of length `length + 1`. Each number replaces the first tail ≥ it (binary search), or extends the list.",
     steps: [
       {
         text: "`[10,9,2,5,3,7,101,18]`, O(n²) table:",
         visual: {
           kind: "grid",
-          rowLabels: ["nums", "dp"],
+          rowLabels: ["nums", "longest"],
           rows: [[10, 9, 2, 5, 3, 7, 101, 18], [1, 1, 1, 2, 2, 3, 4, 4]],
           tones: { good: [[0, 2], [0, 4], [0, 5], [0, 7]] },
           caption: "One LIS: 2, 3, 7, 18 (length 4)",
@@ -100,7 +100,7 @@ export default defineSolutions({
   },
 
   "unique-paths": {
-    idea: "You can only move right or down, so paths into a cell come from **above** or from the **left**: `dp[r][c] = dp[r-1][c] + dp[r][c-1]`. The first row and column have exactly one path each.",
+    idea: "You can only move right or down, so paths into a cell come from **above** or from the **left**: `paths[row][column] = paths[row - 1][column] + paths[row][column - 1]`. The first row and column have exactly one path each.",
     steps: [
       {
         text: "`m = 3`, `n = 7`:",
@@ -111,14 +111,14 @@ export default defineSolutions({
           caption: "28 = 7 (above) + 21 (left)",
         },
       },
-      { text: "One row suffices: `row[c] += row[c-1]`. Or use combinatorics: `C(m+n-2, m-1)`." },
+      { text: "One row suffices: `row[column] += row[column - 1]`. Or use combinatorics: `C(m+n-2, m-1)`." },
     ],
     time: "O(m · n)",
     space: "O(n)",
   },
 
   "partition-equal-subset-sum": {
-    idea: "Two equal halves exist iff some subset sums to `total / 2`. This is 0/1 knapsack on booleans: `can[s]` is true if some subset of the items so far sums to `s`. For each number, update `s` from **high to low** so each item is used once.",
+    idea: "Two equal halves exist iff some subset sums to `total / 2`. This is 0/1 knapsack on booleans: `reachable[value]` is `True` if some subset of the items so far sums to `value`. For each number, update `value` from **high to low** so each item is used once.",
     steps: [
       {
         text: "`[1,5,11,5]`, target 11. Reachable sums after all items:",
@@ -127,18 +127,18 @@ export default defineSolutions({
           colLabels: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"],
           rows: [["T", "T", "·", "·", "·", "T", "T", "·", "·", "·", "T", "T"]],
           tones: { good: [[0, 11]] },
-          caption: "can[11] is true: {11} vs {1, 5, 5}",
+          caption: "reachable[11] is True: {11} vs {1, 5, 5}",
         },
       },
-      { text: "Return false immediately if the total is odd." },
+      { text: "Return `False` immediately if the total is odd." },
     ],
     time: "O(n · sum)",
     space: "O(sum)",
-    pitfalls: ["Iterating `s` low → high would reuse the same item multiple times."],
+    pitfalls: ["Iterating `value` low → high would reuse the same item multiple times."],
   },
 
   "decode-ways": {
-    idea: "`dp[i]` = ways to decode the first `i` characters. The last piece is either one digit (valid if it isn't `'0'`) or two digits (valid if `10..26`). Add the counts from both options.",
+    idea: "`ways[count]` = ways to decode the first `count` characters. The last piece is either one digit (valid if it isn't `'0'`) or two digits (valid if `10..26`). Add the counts from both options.",
     steps: [
       {
         text: "`s = \"226\"`:",
@@ -147,36 +147,36 @@ export default defineSolutions({
           colLabels: ["\"\"", "2", "22", "226"],
           rows: [[1, 1, 2, 3]],
           tones: { good: [[0, 3]] },
-          caption: "dp[3] = dp[2] (\"6\") + dp[1] (\"26\") = 3: BBF, VF, BZ",
+          caption: "ways[3] = ways[2] (\"6\") + ways[1] (\"26\") = 3: BBF, VF, BZ",
         },
       },
-      { text: "`dp[0] = 1` (empty string). Zeros are the tricky part: `\"06\"` has 0 ways." },
+      { text: "`ways[0] = 1` (empty string). Zeros are the tricky part: `\"06\"` has 0 ways." },
     ],
     time: "O(n)",
     space: "O(1)",
   },
 
   "word-break": {
-    idea: "`dp[i]` is true if `s[0:i]` can be segmented. It's true when some earlier split `j` has `dp[j]` true **and** `s[j:i]` is a dictionary word.",
+    idea: "`can_split[end]` is `True` if `s[0:end]` can be segmented. It's true when some earlier split `start` has `can_split[start]` true **and** `s[start:end]` is a dictionary word.",
     steps: [
       {
-        text: "`s = \"leetcode\"`, `dict = {leet, code}`:",
+        text: "`s = \"leetcode\"`, `wordDict = [leet, code]`:",
         visual: {
           kind: "grid",
           colLabels: ["0", "1", "2", "3", "4", "5", "6", "7", "8"],
           rows: [["T", "·", "·", "·", "T", "·", "·", "·", "T"]],
           tones: { accent: [[0, 4]], good: [[0, 8]] },
-          caption: "dp[4]: \"leet\" ✓. dp[8]: dp[4] and \"code\" ✓",
+          caption: "can_split[4]: \"leet\" ✓. can_split[8]: can_split[4] and \"code\" ✓",
         },
       },
-      { text: "Limit `j` to `i - maxWordLen` to skip impossible splits." },
+      { text: "Only try `start` values at least `end` minus the longest word's length, to skip impossible splits." },
     ],
     time: "O(n²) substring checks",
     space: "O(n)",
   },
 
   "edit-distance": {
-    idea: "`dp[i][j]` = edits to turn `a[0:i]` into `b[0:j]`. If the last characters match, `dp[i][j] = dp[i-1][j-1]`. Otherwise take `1 +` the min of **replace** `dp[i-1][j-1]`, **delete** `dp[i-1][j]`, or **insert** `dp[i][j-1]`.",
+    idea: "`distance[first][second]` = edits to turn `word1[:first]` into `word2[:second]`. If the last characters match, `distance[first][second] = distance[first - 1][second - 1]`. Otherwise take `1 +` the min of **replace** `distance[first - 1][second - 1]`, **delete** `distance[first - 1][second]`, or **insert** `distance[first][second - 1]`.",
     steps: [
       {
         text: "`horse → ros`. The first row and column are just counts of inserts and deletes.",

@@ -15,7 +15,7 @@ export default defineSolutions({
   },
 
   "maximum-depth-of-binary-tree": {
-    idea: "Depth = number of levels. Either BFS and count levels, or recurse: `depth(node) = 1 + max(depth(left), depth(right))`, with `depth(null) = 0`.",
+    idea: "Depth = number of levels. Either BFS and count levels, or recurse: `maxDepth(root) = 1 + max(maxDepth(root.left), maxDepth(root.right))`, with `maxDepth(None) = 0`.",
     steps: [
       {
         text: "Each BFS round drains one full level from the queue, so count the rounds.",
@@ -27,7 +27,7 @@ export default defineSolutions({
   },
 
   "binary-tree-level-order-traversal": {
-    idea: "BFS with a queue, but process the queue **one level at a time**: record `size = queue.length` at the start of a round, then pop exactly `size` nodes. Their children form the next level.",
+    idea: "BFS with a queue, but process the queue **one level at a time**: loop `for _ in range(len(queue))`: the length is read once at the start of a round, so it pops exactly that level's nodes. Their children form the next level.",
     steps: [
       {
         text: "Round 1 pops `3` and pushes `9, 20`. Round 2 pops both and pushes `15, 7`.",
@@ -73,7 +73,7 @@ export default defineSolutions({
     idea: "The tree is **perfect**, so once a level's `next` pointers are set, you can walk that level like a linked list and wire up the level below. No queue needed: O(1) extra space.",
     steps: [
       {
-        text: "For each node on the current level: `node.left.next = node.right`, and `node.right.next = node.next ? node.next.left : null`.",
+        text: "For each node on the current level: `node.left.next = node.right`, and, if `node.next` exists, `node.right.next = node.next.left`.",
         visual: { kind: "tree", values: [1, 2, 3, 4, 5, 6, 7], tones: { accent: [1, 2], good: [4, 5] }, caption: "5.next = 2.next.left = 6, which crosses parents" },
       },
       {
@@ -86,7 +86,7 @@ export default defineSolutions({
   },
 
   "count-complete-tree-nodes": {
-    idea: "Compare the depth going always-left with the depth going always-right. If they're equal, the subtree is **perfect**, so it has `2^h - 1` nodes with no traversal. Otherwise recurse into both children; only one of them can be imperfect.",
+    idea: "Compare the depth going always-left with the depth going always-right. If they're equal, the subtree is **perfect**, so it has `2^left_depth - 1` nodes with no traversal. Otherwise recurse into both children; only one of them can be imperfect.",
     steps: [
       {
         text: "Root: left depth 3, right depth 2, so recurse.",
@@ -127,7 +127,7 @@ export default defineSolutions({
     idea: "Write the tree as BFS order with an explicit marker (`#`) for every missing child. Deserialize by reading tokens with a queue of parents: each parent consumes the **next two** tokens as its left and right children.",
     steps: [
       {
-        text: "Serialize with BFS, emitting `#` for nulls:",
+        text: "Serialize with BFS, emitting `#` for missing children (`None`):",
         visual: { kind: "tree", values: [1, 2, 3, null, null, 4, 5] },
       },
       {
@@ -139,10 +139,10 @@ export default defineSolutions({
           caption: "\"1,2,3,#,#,4,5,#,#,#,#\"",
         },
       },
-      { text: "Deserialize: root = token 0; queue = [root]. Pop a parent, create children from the next two tokens (skip `#`), and enqueue real children." },
+      { text: "Deserialize: `root` = token 0; `parents = deque([root])`. Pop a parent, create children from the next two tokens (skip `#`), and enqueue real children." },
     ],
     time: "O(n)",
     space: "O(n)",
-    pitfalls: ["Preorder DFS with null markers also works and is often shorter to code."],
+    pitfalls: ["Preorder DFS with `#` markers also works and is often shorter to code."],
   },
 });

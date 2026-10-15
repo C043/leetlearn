@@ -5,36 +5,36 @@ export default defineSolutions({
     idea: "In a sorted array, comparing the target with the middle element tells you which half **cannot** contain it. Discard that half and repeat. The range halves every step.",
     steps: [
       {
-        text: "`lo = 0`, `hi = n - 1`. `mid = lo + (hi - lo) / 2`. Target `9`: `nums[2] = 3 < 9`, so the answer is right of mid: `lo = mid + 1`.",
+        text: "`low = 0`, `high = len(nums) - 1`. `middle = (low + high) // 2`. Target `9`: `nums[2] = 3 < 9`, so the answer is right of middle: `low = middle + 1`.",
         visual: {
           kind: "array",
           values: [-1, 0, 3, 5, 9, 12],
-          pointers: [{ at: 0, label: "lo" }, { at: 2, label: "mid", tone: "bad" }, { at: 5, label: "hi" }],
+          pointers: [{ at: 0, label: "low" }, { at: 2, label: "middle", tone: "bad" }, { at: 5, label: "high" }],
           tones: { muted: [0, 1, 2] },
           caption: "The grey half is eliminated",
         },
       },
       {
-        text: "Now `lo = 3`, `hi = 5`, `mid = 4`, and `nums[4] = 9`. Found it.",
+        text: "Now `low = 3`, `high = 5`, `middle = 4`, and `nums[4] = 9`. Found it.",
         visual: {
           kind: "array",
           values: [-1, 0, 3, 5, 9, 12],
-          pointers: [{ at: 3, label: "lo" }, { at: 4, label: "mid", tone: "good" }, { at: 5, label: "hi" }],
+          pointers: [{ at: 3, label: "low" }, { at: 4, label: "middle", tone: "good" }, { at: 5, label: "high" }],
           tones: { muted: [0, 1, 2], good: [4] },
         },
       },
-      { text: "Loop while `lo <= hi`; if it ends without a match, return `-1`." },
+      { text: "Loop while `low <= high`; if it ends without a match, return `-1`." },
     ],
     time: "O(log n)",
     space: "O(1)",
-    pitfalls: ["`(lo + hi) / 2` can overflow in fixed-width ints, so use `lo + (hi - lo) / 2`."],
+    pitfalls: ["Python ints never overflow, but in fixed-width ints `(low + high) / 2` can, so use `low + (high - low) / 2` there."],
   },
 
   "search-insert-position": {
     idea: "We want the **first index whose value is ≥ target** (the lower bound). If the target exists, that's its index; if not, it's where it would go.",
     steps: [
       {
-        text: "Use a half-open range `[lo, hi)` with `hi = n`. If `nums[mid] >= target`, the answer is at `mid` or left of it: `hi = mid`. Else `lo = mid + 1`.",
+        text: "Use a half-open range `[low, high)` with `high = len(nums)`. If `nums[middle] >= target`, the answer is at `middle` or left of it: `high = middle`. Else `low = middle + 1`.",
         visual: {
           kind: "array",
           values: [1, 3, 5, 6],
@@ -43,24 +43,24 @@ export default defineSolutions({
           caption: "Target 2: the first value ≥ 2 is 3 at index 1",
         },
       },
-      { text: "When `lo == hi`, return `lo`. It may equal `n` (insert at the end)." },
+      { text: "When `low == high`, return `low`. It may equal `len(nums)` (insert at the end)." },
     ],
     time: "O(log n)",
     space: "O(1)",
   },
 
   "search-a-2d-matrix": {
-    idea: "Each row is sorted and starts after the previous row ends, so the matrix is really **one sorted array of length m·n** laid out in rows. Binary search over virtual index `k` and map it to `(k / n, k % n)`.",
+    idea: "Each row is sorted and starts after the previous row ends, so the matrix is really **one sorted array of length row_count · column_count** laid out in rows. Binary search over a virtual index `middle` and map it to `(middle // column_count, middle % column_count)`.",
     steps: [
       {
-        text: "Search `k ∈ [0, m·n - 1]`. Element at `k` is `matrix[k / n][k % n]`.",
+        text: "Search `middle ∈ [0, row_count · column_count - 1]`. Element at `middle` is `matrix[middle // column_count][middle % column_count]`.",
         visual: {
           kind: "grid",
           rows: [[1, 3, 5, 7], [10, 11, 16, 20], [23, 30, 34, 60]],
           colLabels: ["0", "1", "2", "3"],
           rowLabels: ["0", "1", "2"],
           tones: { accent: [[1, 1]], good: [[0, 1]] },
-          caption: "First mid k = 5 is (1, 1) = 11 > 3, so go left; we end at k = 1 (0, 1) = 3",
+          caption: "First middle = 5 is (1, 1) = 11 > 3, so go left; we end at middle = 1, which is (0, 1) = 3",
         },
       },
       { text: "Standard binary search otherwise." },
@@ -70,20 +70,20 @@ export default defineSolutions({
   },
 
   "search-in-rotated-sorted-array": {
-    idea: "After a rotation, **one half around `mid` is always sorted**. Check which half is sorted. If the target lies within that half's range, search there; otherwise search the other half.",
+    idea: "After a rotation, **one half around `middle` is always sorted**. Check which half is sorted. If the target lies within that half's range, search there; otherwise search the other half.",
     steps: [
       {
-        text: "`nums = [4,5,6,7,0,1,2]`, target `0`. `mid = 3` (7). `nums[lo] = 4 ≤ 7`, so the **left half is sorted**: `[4..7]`. 0 isn't in it, so `lo = mid + 1`.",
+        text: "`nums = [4,5,6,7,0,1,2]`, target `0`. `middle = 3` (7). `nums[low] = 4 ≤ 7`, so the **left half is sorted**: `[4..7]`. 0 isn't in it, so `low = middle + 1`.",
         visual: {
           kind: "array",
           values: [4, 5, 6, 7, 0, 1, 2],
-          pointers: [{ at: 0, label: "lo" }, { at: 3, label: "mid", tone: "bad" }, { at: 6, label: "hi" }],
+          pointers: [{ at: 0, label: "low" }, { at: 3, label: "middle", tone: "bad" }, { at: 6, label: "high" }],
           tones: { muted: [0, 1, 2, 3] },
           caption: "The left half is sorted and doesn't contain 0, so discard it",
         },
       },
       {
-        text: "Now `[0,1,2]`: `mid = 5` (1). Left part `[0,1]` is sorted and `0 ≤ 0 < 1`, so `hi = mid - 1`. Then `mid = 4` holds 0.",
+        text: "Now `[0,1,2]`: `middle = 5` (1). Left part `[0,1]` is sorted and `0 ≤ 0 < 1`, so `high = middle - 1`. Then `middle = 4` holds 0.",
         visual: {
           kind: "array",
           values: [4, 5, 6, 7, 0, 1, 2],
@@ -94,27 +94,27 @@ export default defineSolutions({
     ],
     time: "O(log n)",
     space: "O(1)",
-    pitfalls: ["Use `nums[lo] <= nums[mid]` (with `=`) so a 2-element range is handled correctly."],
+    pitfalls: ["Use `nums[low] <= nums[middle]` (with `=`) so a 2-element range is handled correctly."],
   },
 
   "find-minimum-in-rotated-sorted-array": {
-    idea: "Compare `nums[mid]` to `nums[hi]`. If `nums[mid] > nums[hi]`, the drop (the minimum) is to the right of mid. Otherwise `mid..hi` is sorted, so the minimum is at `mid` or left of it.",
+    idea: "Compare `nums[middle]` to `nums[high]`. If `nums[middle] > nums[high]`, the drop (the minimum) is to the right of middle. Otherwise `middle..high` is sorted, so the minimum is at `middle` or left of it.",
     steps: [
       {
-        text: "`[3,4,5,1,2]`: `mid = 2` (5) > `nums[hi]` (2), so `lo = mid + 1`.",
+        text: "`[3,4,5,1,2]`: `middle = 2` (5) > `nums[high]` (2), so `low = middle + 1`.",
         visual: {
           kind: "array",
           values: [3, 4, 5, 1, 2],
-          pointers: [{ at: 0, label: "lo" }, { at: 2, label: "mid", tone: "bad" }, { at: 4, label: "hi" }],
+          pointers: [{ at: 0, label: "low" }, { at: 2, label: "middle", tone: "bad" }, { at: 4, label: "high" }],
           tones: { muted: [0, 1, 2] },
         },
       },
       {
-        text: "`lo = 3`, `hi = 4`, `mid = 3` (1) < 2, so `hi = mid`. Loop ends at `lo == hi = 3`.",
+        text: "`low = 3`, `high = 4`, `middle = 3` (1) < 2, so `high = middle`. Loop ends at `low == high == 3`.",
         visual: {
           kind: "array",
           values: [3, 4, 5, 1, 2],
-          pointers: [{ at: 3, label: "lo = hi", tone: "good" }],
+          pointers: [{ at: 3, label: "low = high", tone: "good" }],
           tones: { muted: [0, 1, 2], good: [3] },
           caption: "Minimum = 1",
         },
@@ -122,24 +122,24 @@ export default defineSolutions({
     ],
     time: "O(log n)",
     space: "O(1)",
-    pitfalls: ["Loop with `lo < hi` and use `hi = mid` (not `mid - 1`), since mid might be the minimum."],
+    pitfalls: ["Loop with `low < high` and use `high = middle` (not `middle - 1`), since middle might be the minimum."],
   },
 
   "find-peak-element": {
-    idea: "If `nums[mid] < nums[mid + 1]`, you're on an **upward slope**, and a peak must exist to the right (the values can't rise forever; `nums[n] = -∞`). Otherwise a peak is at `mid` or to the left.",
+    idea: "If `nums[middle] < nums[middle + 1]`, you're on an **upward slope**, and a peak must exist to the right (the values can't rise forever; treat the position past the end as `-∞`). Otherwise a peak is at `middle` or to the left.",
     steps: [
       {
-        text: "`mid = 3` (3) < `nums[4]` (5): climbing, so `lo = mid + 1`.",
+        text: "`middle = 3` (3) < `nums[4]` (5): climbing, so `low = middle + 1`.",
         visual: {
           kind: "bars",
           values: [1, 2, 1, 3, 5, 6, 4],
-          pointers: [{ at: 3, label: "mid" }],
+          pointers: [{ at: 3, label: "middle" }],
           tones: { accent: [3, 4] },
           caption: "Rising to the right, so a peak is guaranteed on that side",
         },
       },
       {
-        text: "Repeat until `lo == hi`. Here we land on index 5 (value 6).",
+        text: "Repeat until `low == high`. Here we land on index 5 (value 6).",
         visual: {
           kind: "bars",
           values: [1, 2, 1, 3, 5, 6, 4],
@@ -153,23 +153,23 @@ export default defineSolutions({
   },
 
   "koko-eating-bananas": {
-    idea: "**Binary search on the answer.** If Koko can finish at speed `k`, she can at any faster speed. The predicate is monotonic, so find the smallest `k ∈ [1, max(piles)]` where total hours `Σ ceil(p / k) ≤ h`.",
+    idea: "**Binary search on the answer.** If Koko can finish at `speed`, she can at any faster speed. The predicate is monotonic, so find the smallest `speed ∈ [1, max(piles)]` where total hours `Σ ceil(pile / speed) ≤ h`.",
     steps: [
       {
         text: "`piles = [3,6,7,11]`, `h = 8`. Hours per speed:",
         visual: {
           kind: "grid",
-          colLabels: ["k", "hours", "ok?"],
+          colLabels: ["speed", "hours", "ok?"],
           rows: [[1, 27, "✗"], [2, 15, "✗"], [3, 10, "✗"], [4, 8, "✓"], [5, 8, "✓"], [11, 4, "✓"]],
           tones: { bad: [[0, 2], [1, 2], [2, 2]], good: [[3, 0], [3, 1], [3, 2]] },
-          caption: "False…False, True…True: binary search finds the first True, k = 4",
+          caption: "False…False, True…True: binary search finds the first True, speed = 4",
         },
       },
-      { text: "If `hours(mid) <= h`, then `hi = mid` (try slower); else `lo = mid + 1`." },
+      { text: "If `hours <= h`, then `high = speed` (try slower); else `low = speed + 1`." },
     ],
     time: "O(n · log(max pile))",
     space: "O(1)",
-    pitfalls: ["`ceil(p / k)` in integer math is `(p + k - 1) / k`."],
+    pitfalls: ["`ceil(pile / speed)` in integer math is `(pile + speed - 1) // speed`."],
   },
 
   "capacity-to-ship-packages-within-d-days": {
@@ -185,17 +185,17 @@ export default defineSolutions({
           caption: "5 days, which fits. Capacity 14 would need 6 days, so the answer is 15",
         },
       },
-      { text: "If `daysNeeded(mid) <= days`, then `hi = mid`, else `lo = mid + 1`. Return `lo`." },
+      { text: "If `days_needed(middle) <= days`, then `high = middle`, else `low = middle + 1`. Return `low`." },
     ],
     time: "O(n · log(sum))",
     space: "O(1)",
   },
 
   "time-based-key-value-store": {
-    idea: "Timestamps for each key arrive in **increasing order**, so `set` just appends to that key's list. `get(key, t)` binary-searches for the **last timestamp ≤ t**.",
+    idea: "Timestamps for each key arrive in **increasing order**, so `set` just appends to that key's lists. `get(key, timestamp)` binary-searches for the **last stored time ≤ timestamp**.",
     steps: [
       {
-        text: "Store `key → [(timestamp, value), …]`, already sorted.",
+        text: "Store `times[key]` and `values[key]` as parallel lists, already sorted by time.",
         visual: {
           kind: "array",
           values: ["1:bar", "4:bar2", "7:baz", "10:qux"],
@@ -204,39 +204,39 @@ export default defineSolutions({
           caption: "Last timestamp ≤ 8 is 7, so return \"baz\"",
         },
       },
-      { text: "Find the first timestamp `> t` (upper bound) and step back one. If that's index `-1`, return `\"\"`." },
+      { text: "`bisect_right` finds the first time `> timestamp` (upper bound); step back one. If that's index `-1`, return `\"\"`." },
     ],
     time: "set O(1), get O(log n)",
     space: "O(total sets)",
   },
 
   "median-of-two-sorted-arrays": {
-    idea: "Cut both arrays so the **left parts together hold half** of all elements and every left element ≤ every right element. Then the median comes from the four values around the cuts. Binary search the cut position `i` in the **shorter** array; `j = half - i` is forced.",
+    idea: "Cut both arrays so the **left parts together hold half** of all elements and every left element ≤ every right element. Then the median comes from the four values around the cuts. Binary search the cut position `take_from_nums1` in the **shorter** array; `take_from_nums2 = half - take_from_nums1` is forced.",
     steps: [
       {
-        text: "A cut is valid when `A[i-1] ≤ B[j]` and `B[j-1] ≤ A[i]`. If `A[i-1] > B[j]`, move `i` left; if `B[j-1] > A[i]`, move `i` right.",
+        text: "A cut is valid when `nums1_left <= nums2_right` and `nums2_left <= nums1_right` (the values on either side of each cut). If `nums1_left > nums2_right`, take fewer from `nums1`; if `nums2_left > nums1_right`, take more.",
         visual: {
           kind: "array",
           values: [1, 3, 8, 9, 15],
-          pointers: [{ at: 4, label: "i = 4" }],
+          pointers: [{ at: 4, label: "take 4" }],
           tones: { good: [0, 1, 2, 3] },
-          caption: "A: left part [1,3,8,9]",
+          caption: "nums1: left part [1,3,8,9]",
         },
       },
       {
-        text: "With `half = 6`, `j = 2`: B's left part is `[7, 11]`. Check: `9 ≤ 18` ✓ and `11 ≤ 15` ✓, so the cut is valid.",
+        text: "With `half = 6`, `take_from_nums2 = 2`: nums2's left part is `[7, 11]`. Check: `9 ≤ 18` ✓ and `11 ≤ 15` ✓, so the cut is valid.",
         visual: {
           kind: "array",
           values: [7, 11, 18, 19, 21, 25],
-          pointers: [{ at: 2, label: "j = 2" }],
+          pointers: [{ at: 2, label: "take 2" }],
           tones: { good: [0, 1] },
-          caption: "B: left part [7,11]",
+          caption: "nums2: left part [7,11]",
         },
       },
-      { text: "Total is odd (11), so median = `max(A[i-1], B[j-1]) = max(9, 11) = 11`. For even totals, average that with `min(A[i], B[j])`. Use ±∞ for out-of-range indices." },
+      { text: "Total is odd (11), so median = `max(nums1_left, nums2_left) = max(9, 11) = 11`. For even totals, average that with `min(nums1_right, nums2_right)`. Use ±∞ for out-of-range indices." },
     ],
     time: "O(log(min(m, n)))",
     space: "O(1)",
-    pitfalls: ["Always binary-search the **shorter** array, or `j` can go out of bounds."],
+    pitfalls: ["Always binary-search the **shorter** array, or `take_from_nums2` can go out of bounds."],
   },
 });

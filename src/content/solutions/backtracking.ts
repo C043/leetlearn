@@ -5,7 +5,7 @@ export default defineSolutions({
     idea: "DFS from the root, subtracting each node's value from the remaining target. At a **leaf**, check whether what's left equals the leaf's value.",
     steps: [
       {
-        text: "`targetSum = 22`. Pass `remaining - node.val` down to each child.",
+        text: "`targetSum = 22`. Pass `remaining = targetSum - root.val` down to each child.",
         visual: {
           kind: "tree",
           values: [5, 4, 8, 11, null, 13, 4, 7, 2, null, null, null, null, null, 1],
@@ -13,15 +13,15 @@ export default defineSolutions({
           caption: "5 + 4 + 11 + 2 = 22",
         },
       },
-      { text: "Return `hasPathSum(left, rem) || hasPathSum(right, rem)`. Only leaves can end a path, so a node with a single child isn't a stopping point." },
+      { text: "Return `self.hasPathSum(root.left, remaining) or self.hasPathSum(root.right, remaining)`. Only leaves can end a path, so a node with a single child isn't a stopping point." },
     ],
     time: "O(n)",
     space: "O(h)",
-    pitfalls: ["An empty tree returns `false`, even for `targetSum = 0`."],
+    pitfalls: ["An empty tree returns `False`, even for `targetSum = 0`."],
   },
 
   "binary-watch": {
-    idea: "The search space is tiny: 12 hours × 60 minutes. Enumerate every time and keep those where `popcount(h) + popcount(m) == turnedOn`. Backtracking over the 10 LEDs also works but isn't needed.",
+    idea: "The search space is tiny: 12 hours × 60 minutes. Enumerate every time and keep those where `bin(hour).count(\"1\") + bin(minute).count(\"1\") == turnedOn`. Backtracking over the 10 LEDs also works but isn't needed.",
     steps: [
       {
         text: "Each LED is one bit. `3:25` lights hours `2+1` and minutes `16+8+1`, for 5 LEDs.",
@@ -66,7 +66,7 @@ export default defineSolutions({
     idea: "Every node of the recursion tree is a subset. From a node, extend only with elements **after** the last one used (a `start` index), which yields each subset exactly once.",
     steps: [
       {
-        text: "`[1,2,3]`: record the current path at every node, then branch on `i = start..n-1`.",
+        text: "`[1,2,3]`: record the current path at every node, then branch on `index` from `start` to `len(nums) - 1`.",
         visual: {
           kind: "ntree",
           root: {
@@ -107,7 +107,7 @@ export default defineSolutions({
           },
         },
       },
-      { text: "When `path.length == n`, copy it into the result." },
+      { text: "When `len(path) == len(nums)`, copy it into the result." },
     ],
     time: "O(n · n!)",
     space: "O(n)",
@@ -162,7 +162,7 @@ export default defineSolutions({
           caption: "[a, a, b] and [aa, b]",
         },
       },
-      { text: "Precompute `isPal[i][j]` with DP to make each palindrome check O(1)." },
+      { text: "Precompute `is_palindrome[start][end]` with DP to make each palindrome check O(1)." },
     ],
     time: "O(n · 2ⁿ)",
     space: "O(n²) for the table",
@@ -180,7 +180,7 @@ export default defineSolutions({
           caption: "A → B → C → C → E → D",
         },
       },
-      { text: "Temporarily overwrite `board[r][c] = '#'` instead of a separate visited set, and restore it afterwards." },
+      { text: "Temporarily overwrite `board[row][column] = \"#\"` instead of a separate visited set, and restore it afterwards." },
     ],
     time: "O(m · n · 3^L)",
     space: "O(L) recursion",
@@ -199,14 +199,14 @@ export default defineSolutions({
           caption: "Alternating colors are the 4 segments",
         },
       },
-      { text: "Recurse `(start, segmentsUsed)`. Try lengths 1..3; stop on invalid segments. When `segmentsUsed == 4 && start == n`, record." },
+      { text: "Recurse with `(start, parts)`. Try lengths 1..3; stop on invalid segments. When `parts_used == 4` and `remaining == 0`, record." },
     ],
     time: "O(3⁴), constant",
     space: "O(1)",
   },
 
   "n-queens": {
-    idea: "Place one queen per row. For each column in the current row, check whether that column, the `r - c` diagonal, or the `r + c` anti-diagonal is already attacked (three hash sets). If not, place, recurse to the next row, and remove.",
+    idea: "Place one queen per row. For each column in the current row, check whether that column, the `row - column` diagonal, or the `row + column` anti-diagonal is already attacked (three hash sets). If not, place, recurse to the next row, and remove.",
     steps: [
       {
         text: "One of the two solutions for `n = 4`:",
@@ -216,7 +216,7 @@ export default defineSolutions({
           tones: { good: [[0, 1], [1, 3], [2, 0], [3, 2]] },
         },
       },
-      { text: "All cells on a diagonal share `r - c`; all on an anti-diagonal share `r + c`. That's how one set covers an entire diagonal." },
+      { text: "All cells on a diagonal share `row - column`; all on an anti-diagonal share `row + column`. That's how one set covers an entire diagonal." },
     ],
     time: "O(n!)",
     space: "O(n)",

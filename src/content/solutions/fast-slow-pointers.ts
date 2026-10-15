@@ -24,7 +24,7 @@ export default defineSolutions({
           tones: { good: [3] },
         },
       },
-      { text: "Loop while `fast && fast.next`; if that fails, return `false`." },
+      { text: "Loop while `fast and fast.next`; if that fails, return `False`." },
     ],
     time: "O(n)",
     space: "O(1)",
@@ -34,7 +34,7 @@ export default defineSolutions({
     idea: "When `fast` (2 steps) reaches the end, `slow` (1 step) has covered half the distance, so it's at the middle.",
     steps: [
       {
-        text: "Move both until `fast` is `null` or `fast.next` is `null`.",
+        text: "Move both until `fast` is `None` or `fast.next` is `None`.",
         visual: {
           kind: "list",
           values: [1, 2, 3, 4, 5],
@@ -50,7 +50,7 @@ export default defineSolutions({
           values: [1, 2, 3, 4, 5, 6],
           pointers: [{ at: 3, label: "slow", tone: "good" }],
           tones: { good: [3] },
-          caption: "fast ends at null, past node 6",
+          caption: "fast ends at None, past node 6",
         },
       },
     ],
@@ -72,12 +72,12 @@ export default defineSolutions({
         },
       },
       {
-        text: "Phase 2: `p = head`, `q = meet`. Step both by one. They meet at node `2`, the cycle start.",
+        text: "Phase 2: reset `slow = head` and leave `fast` at the meeting point. Step both by one. They meet at node `2`, the cycle start.",
         visual: {
           kind: "list",
           values: [3, 2, 0, -4],
           cycleTo: 1,
-          pointers: [{ at: 1, label: "p = q", tone: "good" }],
+          pointers: [{ at: 1, label: "slow = fast", tone: "good" }],
           tones: { good: [1] },
         },
       },
@@ -88,10 +88,10 @@ export default defineSolutions({
   },
 
   "find-the-duplicate-number": {
-    idea: "Treat each index as a node with an edge `i → nums[i]`. Values are in `[1, n]`, so starting from 0 you never leave the array, and the duplicate value has **two incoming edges**. That value is the entrance of a cycle. Use Linked List Cycle II.",
+    idea: "Treat each index as a node with an edge `index → nums[index]`. Values are in `[1, n]`, so starting from 0 you never leave the array, and the duplicate value has **two incoming edges**. That value is the entrance of a cycle. Use Linked List Cycle II.",
     steps: [
       {
-        text: "`nums = [1,3,4,2,2]`: following `i → nums[i]` from 0 gives `0 → 1 → 3 → 2 → 4 → 2 → …`",
+        text: "`nums = [1,3,4,2,2]`: following `index → nums[index]` from 0 gives `0 → 1 → 3 → 2 → 4 → 2 → …`",
         visual: {
           kind: "list",
           values: [0, 1, 3, 2, 4],
@@ -117,14 +117,14 @@ export default defineSolutions({
         text: "`2 → 4 → 16 → 37 → 58 → 89 → 145 → 42 → 20 → 4 …` loops forever without 1.",
         visual: { kind: "list", values: [2, 4, 16, 37, 58, 89, 145, 42, 20], cycleTo: 1, tones: { bad: [1] } },
       },
-      { text: "`slow = next(slow)`, `fast = next(next(fast))`. Stop when `fast == 1` (happy) or `slow == fast` (cycle)." },
+      { text: "`slow = step(slow)`, `fast = step(step(fast))`. Stop when `fast == 1` (happy) or `slow == fast` (cycle)." },
     ],
     time: "O(log n) per step",
     space: "O(1)",
   },
 
   "circular-array-loop": {
-    idea: "Each index jumps to `(i + nums[i]) mod n`. That's a functional graph, so run fast/slow from every start. A valid loop must have **length > 1** and keep **one direction** (all positive or all negative). Mark dead-end paths so each index is processed once.",
+    idea: "Each index jumps to `next_index(index) = (index + nums[index]) % length`. That's a functional graph, so run fast/slow from every start. A valid loop must have **length > 1** and keep **one direction** (all positive or all negative). Mark dead-end paths so each index is processed once.",
     steps: [
       {
         text: "`nums = [2,-1,1,2,2]`. Draw the jump graph:",
@@ -139,10 +139,10 @@ export default defineSolutions({
             { id: "1", x: 0, y: 1 },
           ],
           edges: [["0", "2"], ["2", "3"], ["3", "0"], ["4", "1"], ["1", "0"]],
-          caption: "0 → 2 → 3 → 0 is a forward-only cycle of length 3, so return true",
+          caption: "0 → 2 → 3 → 0 is a forward-only cycle of length 3, so return True",
         },
       },
-      { text: "While moving, abort if a step changes direction (`nums[x] * nums[start] < 0`) or is a self-loop (`next(x) == x`)." },
+      { text: "While moving, abort if a step changes direction (`(nums[first_hop] > 0) != forward`) or the loop found is a self-loop (`slow == next_index(slow)`)." },
       { text: "If a start fails, walk its path again and set those entries to `0` so they're never re-explored. This keeps the whole thing O(n)." },
     ],
     time: "O(n)",
@@ -206,7 +206,7 @@ export default defineSolutions({
         },
       },
       {
-        text: "`before.tail.next = after.head`, and **set `after.tail.next = null`** to cut the old link.",
+        text: "`before_tail.next = after.next`, and **set `after_tail.next = None`** to cut the old link.",
         visual: { kind: "list", values: [1, 2, 2, 4, 3, 5], tones: { good: [0, 1, 2], bad: [3, 4, 5] } },
       },
     ],
@@ -228,7 +228,7 @@ export default defineSolutions({
         },
       },
       {
-        text: "Reverse each full group and reconnect: `groupPrev.next = newHead`, old head `.next = nextGroupStart`.",
+        text: "Reverse each full group and reconnect: `group_previous.next = group_last` (the new first node), and the old first node links to `group_next`.",
         visual: { kind: "list", values: [2, 1, 4, 3, 5], tones: { accent: [0, 1], good: [2, 3], muted: [4] } },
       },
       { text: "A dummy node before `head` avoids special-casing the first group." },
