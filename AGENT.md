@@ -138,6 +138,37 @@ model PushSubscription {
 
 ---
 
+## Test-Driven Development (required)
+
+Every new feature and every bug fix is built test-first. No production code is written without a failing test that demands it.
+
+### The Cycle
+1. Red: write the smallest test that describes the next piece of behavior. Run it and watch it fail for the expected reason (not a typo or import error).
+2. Green: write the minimum production code to make it pass. Run the full suite.
+3. Refactor: clean up the code and the tests while everything stays green.
+4. Repeat until the feature is complete. Each domain rule in this file (unlocking, review selection, streaks, training) should map to at least one test.
+
+### Bug Fixes
+- First write a test that reproduces the bug and fails. Then fix it. The test stays in the suite as a regression guard.
+
+### Tooling
+- Test runner: Vitest. Tests live next to the code they cover as `*.test.ts` / `*.test.tsx` (e.g. src/lib/streak.test.ts).
+- `npm test` runs the suite once; `npm run test:watch` runs it in watch mode. The suite must pass before a change is considered done.
+- If Vitest is not set up yet, setting it up (config + scripts) is the first step of the next feature.
+
+### What to Test
+- Domain logic in src/lib/ (review selection and priority ranking, streak derivation, reminder stages, training session building, `normalizeAnswer`): unit tests with plain inputs and a fixed clock (`vi.useFakeTimers` / `vi.setSystemTime`). Keep this logic in pure functions so it can be tested without a database.
+- API routes and code that touches Prisma: test against a separate test database (`DATABASE_URL` pointing at a throwaway Postgres schema), never the real one. Reset state between tests.
+- Content (src/content/): keep the build-time validators covered, including a failing case for each rule they enforce.
+- Components: test behavior a user can see (node states, modal open/close, answer feedback) with React Testing Library, not implementation details.
+
+### Rules
+- Never change or delete a test just to make it pass. If a test is wrong, say so and fix the test in its own step.
+- Don't skip, `.only`, or comment out tests in committed code.
+- Tests use time zones and dates explicitly; never rely on the machine's local time.
+
+---
+
 ## Codebase Conventions
 
 1. Use Next.js App Router (src/app).
