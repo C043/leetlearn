@@ -114,6 +114,37 @@ Open the flame in the header and tap **Turn on reminders**, then **Send test** t
 
 ---
 
+## Testing
+
+### Full Suite (Docker)
+
+```bash
+npm run test:docker
+```
+
+Runs the whole suite in throwaway containers (`docker-compose.test.yml`) against an in-memory Postgres, separate from your real database. It stops at the first failing step and removes the containers afterwards. The steps, from `scripts/test.sh`:
+
+1. Typecheck (`tsc --noEmit`) and lint (`eslint`).
+2. Unit tests: streak and time zone date logic (DST, half-hour offsets, leap years), the Saturday review schedule, content corpus validation, solution walkthroughs and their diagrams, the scheduler, the web app manifest and config, and the service worker (caching, offline fallback, push and notification clicks).
+3. Component tests in jsdom.
+4. Database tests against real Postgres: streaks and the activity backfill, review rotation, queries, push delivery and VAPID keys, reminder stages, every API route, the seed script, and server-rendered pages.
+5. Python reference solutions: every snippet in `src/content/solutions/code/` is executed against edge cases.
+6. A production build (`next build`), then end-to-end HTTP tests against `next start`.
+
+### Running Suites Locally
+
+```bash
+npm test             # unit + component tests (needs `npx prisma generate`)
+npm run test:watch   # same, in watch mode
+npm run test:db      # database, API and page tests
+```
+
+`npm run test:db` wipes every table before each test. Point `DATABASE_URL` at a disposable database, never at the one holding your progress.
+
+Tests live in `tests/`, split into `unit/`, `components/`, `db/`, `e2e/` and `python/`, with shared helpers in `tests/helpers/`. Training mode is still in development and is not covered yet.
+
+---
+
 ## Streaks
 
 - Each calendar day with at least one solve is stored in `ActivityDay`. The streak is the run of consecutive days ending today, or yesterday if you haven't solved anything yet today.
