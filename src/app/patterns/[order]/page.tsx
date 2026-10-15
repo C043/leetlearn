@@ -1,15 +1,10 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
-import { CircleCheck } from "lucide-react";
-import { getPattern, getPatternSummaries, getReviewQueue } from "@/lib/queries";
-import { getVapidKeys } from "@/lib/push";
-import { nextScheduledRotation, rotateReviewQueueIfDue } from "@/lib/review-service";
-import { getSettings, getStreak } from "@/lib/streak";
+import { getPattern } from "@/lib/queries";
+import { getHeaderData } from "@/lib/header-data";
 import { ProblemModalProvider } from "@/components/duolingo/ProblemModalProvider";
+import AppHeader from "@/components/duolingo/AppHeader";
+import BackToPaths from "@/components/duolingo/BackToPaths";
 import PatternPath from "@/components/duolingo/PatternPath";
-import PatternSwitcher from "@/components/duolingo/PatternSwitcher";
-import ReviewQueue from "@/components/review/ReviewQueue";
-import StreakButton from "@/components/streak/StreakButton";
 
 export const dynamic = "force-dynamic";
 
@@ -21,50 +16,18 @@ export default async function PatternPage({
   const order = Number((await params).order);
   if (!Number.isInteger(order)) notFound();
 
-  // Cheap safety net in case the cron job didn't fire (e.g. dev server restarts)
-  await rotateReviewQueueIfDue();
-
-  const [pattern, summaries, review, streak, settings, vapid] = await Promise.all([
-    getPattern(order),
-    getPatternSummaries(),
-    getReviewQueue(),
-    getStreak(),
-    getSettings(),
-    getVapidKeys(),
-  ]);
+  const [pattern, { header }] = await Promise.all([getPattern(order), getHeaderData()]);
   if (!pattern) notFound();
 
-  const totalSolved = summaries.reduce((n, p) => n + p.solved, 0);
-  const total = summaries.reduce((n, p) => n + p.total, 0);
   const solvedHere = pattern.problems.filter((p) => p.isSolved).length;
 
   return (
     <ProblemModalProvider>
-      <header className="sticky top-0 z-40 border-b-2 border-zinc-200 bg-[var(--background)]/90 backdrop-blur dark:border-zinc-800">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-          <Link href="/" className="text-2xl font-black tracking-tight text-green-500">
-            LeetLearn
-          </Link>
-          <div className="flex items-center gap-3">
-            <span className="flex items-center gap-1.5 font-extrabold text-green-500" title="Problems solved">
-              <CircleCheck className="size-5" strokeWidth={3} />
-              {totalSolved}
-              <span className="text-sm font-bold text-zinc-400">/ {total}</span>
-            </span>
-            <StreakButton
-              streak={streak}
-              prefs={{ reminderHour: settings.reminderHour, vapidPublicKey: vapid.publicKey }}
-            />
-          </div>
-        </div>
-      </header>
+      <AppHeader {...header} />
 
-      <div className="mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)] gap-6 px-4 py-6 lg:grid-cols-[240px_minmax(0,1fr)_300px]">
-        <aside className="min-w-0 lg:sticky lg:top-20 lg:self-start">
-          <PatternSwitcher patterns={summaries} activeOrder={order} />
-        </aside>
-
-        <main className="min-w-0">
+      <div className="mx-auto max-w-2xl px-4 py-6">
+        <BackToPaths />
+        <main className="mt-5 min-w-0">
           <section className="rounded-3xl border-b-4 border-green-700 bg-green-500 p-5 text-white">
             <p className="text-xs font-extrabold uppercase tracking-wider text-green-100">
               Path {pattern.order} · {solvedHere}/{pattern.problems.length} solved
@@ -74,10 +37,6 @@ export default async function PatternPage({
           </section>
           <PatternPath problems={pattern.problems} />
         </main>
-
-        <aside className="min-w-0 lg:sticky lg:top-20 lg:self-start">
-          <ReviewQueue problems={review} nextRotation={nextScheduledRotation().toISOString()} />
-        </aside>
       </div>
     </ProblemModalProvider>
   );

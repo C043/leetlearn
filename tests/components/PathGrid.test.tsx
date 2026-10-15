@@ -20,6 +20,12 @@ describe("PathGrid", () => {
     expect(within(tiles[1]).getByText("Pattern 2")).toBeInTheDocument();
   });
 
+  it("puts the path number before the name, on the same line", () => {
+    render(<PathGrid patterns={[p(7, 0)]} />);
+    const heading = within(screen.getByRole("link")).getByRole("heading");
+    expect(heading).toHaveTextContent(/^7\s*Pattern 7$/);
+  });
+
   it("shows each path's progress", () => {
     render(<PathGrid patterns={[p(1, 3)]} />);
     const tile = screen.getByRole("link", { name: /Pattern 1/ });

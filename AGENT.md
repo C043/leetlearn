@@ -129,6 +129,8 @@ model PushSubscription {
 ## UI Guidelines
 
 - Design Style: Duolingo-inspired path layout.
+- Path Selection (`/`): a Saturday Review tile on top (links to `/review`), then one big colorful tile per pattern with its progress bar; each pattern's color comes from `pathColor` (src/lib/path-tiles.ts), and the first unfinished pattern is flagged "Continue".
+- Path (`/patterns/[order]`) and Review (`/review`) pages: a single centered column with a "Back to paths" button; no sidebars.
 - Path Visualization: Winding zigzag or snake path of circular buttons representing problem nodes.
 - Node States:
   - Locked: Grayed out with lock icon (unlocked = false).
