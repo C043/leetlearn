@@ -9,7 +9,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "vitest run --project unit --project components",
+    "test:db": "vitest run --project db",
+    "test:watch": "vitest --project unit --project components",
+    "test:docker": "docker compose -f docker-compose.test.yml up --build --abort-on-container-exit --exit-code-from tests; code=$?; docker compose -f docker-compose.test.yml down --remove-orphans; exit $code"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
@@ -23,6 +27,10 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
     "@types/node": "^20",
     "@types/node-cron": "^3.0.11",
     "@types/react": "^19",
@@ -30,9 +38,11 @@
     "@types/web-push": "^3.6.4",
     "eslint": "^9",
     "eslint-config-next": "16.3.8",
+    "jsdom": "^26.1.0",
     "prisma": "^5.22.0",
     "tailwindcss": "^4",
     "tsx": "^4.19.0",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^3.2.4"
   }
 }

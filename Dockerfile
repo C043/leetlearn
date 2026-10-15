@@ -17,6 +17,15 @@ COPY . .
 RUN npx prisma generate
 RUN npm run build
 
+# Test suite (docker-compose.test.yml): full sources, dev dependencies and
+# Python for the reference-solution tests. Not used by the production image.
+FROM base AS test
+RUN apk add --no-cache python3
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+RUN npx prisma generate
+CMD ["sh", "scripts/test.sh"]
+
 # 3. Production runner
 FROM base AS runner
 ENV NODE_ENV=production

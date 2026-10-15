@@ -1,0 +1,34 @@
+# Whole test suite in throwaway containers; never touches the real database.
+#   npm run test:docker
+# which runs:
+#   docker compose -f docker-compose.test.yml up --build --abort-on-container-exit --exit-code-from tests
+name: leetlearn-test
+
+services:
+  test-db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: leetlearn
+      POSTGRES_PASSWORD: leetlearn_pass
+      POSTGRES_DB: leetlearn_test
+    # In memory: fast, and gone when the run ends
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U leetlearn -d leetlearn_test"]
+      interval: 2s
+      timeout: 5s
+      retries: 15
+
+  tests:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: test
+    environment:
+      DATABASE_URL: "postgresql://leetlearn:leetlearn_pass@test-db:5432/leetlearn_test?schema=public"
+      VAPID_SUBJECT: "mailto:test@example.com"
+      TZ: "UTC"
+    depends_on:
+      test-db:
+        condition: service_healthy
