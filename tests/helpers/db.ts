@@ -1,4 +1,4 @@
-import type { Difficulty } from "@prisma/client";
+import type { Difficulty, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { PATTERNS } from "@/content";
 
@@ -67,6 +67,6 @@ export async function setActivityDays(days: string[]) {
   await prisma.activityDay.createMany({ data: days.map((day) => ({ day, solves: 1 })) });
 }
 
-export async function setSettings(data: Parameters<typeof prisma.appSettings.create>[0]["data"]) {
+export async function setSettings(data: Omit<Prisma.AppSettingsCreateInput, "id">) {
   return prisma.appSettings.upsert({ where: { id: 1 }, update: data, create: { id: 1, ...data } });
 }

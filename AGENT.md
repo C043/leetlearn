@@ -164,9 +164,16 @@ Every new feature and every bug fix is built test-first. No production code is w
 - First write a test that reproduces the bug and fails. Then fix it. The test stays in the suite as a regression guard.
 
 ### Tooling
-- Test runner: Vitest. Tests live next to the code they cover as `*.test.ts` / `*.test.tsx` (e.g. src/lib/streak.test.ts).
-- `npm test` runs the suite once; `npm run test:watch` runs it in watch mode. The suite must pass before a change is considered done.
-- If Vitest is not set up yet, setting it up (config + scripts) is the first step of the next feature.
+- Test runner: Vitest (vitest.config.mts), with one project per folder under `tests/`:
+  - `tests/unit/`: pure logic, no I/O (node).
+  - `tests/components/`: components and browser code with React Testing Library (jsdom).
+  - `tests/db/`: services, API routes and server-rendered pages against a real Postgres. Every table is truncated before each test.
+  - `tests/e2e/`: HTTP against a built `next start`. Files share one seeded database, so each file must only touch data no other file relies on.
+  - `tests/python/`: every reference solution in src/content/solutions/code/ run against edge cases and brute-force oracles. A new problem needs a case there, or the run fails.
+- Shared helpers live in `tests/helpers/` (DB fixtures, view fixtures, request builders). Name test files after what they cover (e.g. tests/db/streak.test.ts for src/lib/streak.ts).
+- `npm test` runs unit + component tests; `npm run test:watch` runs them in watch mode; `npm run test:db` runs the database suite (DATABASE_URL must be a disposable database).
+- `npm run test:docker` runs everything (typecheck, lint, all suites, Python solutions, production build, e2e) in throwaway containers. It must pass before a change is considered done.
+- Tests are type-checked through `tests/tsconfig.json`; the root tsconfig excludes `tests/` so a test can never break `next build`.
 
 ### What to Test
 - Domain logic in src/lib/ (review selection and priority ranking, streak derivation, reminder stages, training session building, `normalizeAnswer`): unit tests with plain inputs and a fixed clock (`vi.useFakeTimers` / `vi.setSystemTime`). Keep this logic in pure functions so it can be tested without a database.

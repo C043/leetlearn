@@ -139,7 +139,7 @@ class Solution:
         return view
 `,
 
-  "populate-next-right-pointers-in-each-node": `
+  "populating-next-right-pointers-in-each-node": `
 class Solution:
     def connect(self, root: Optional[Node]) -> Optional[Node]:
         # The first node of the level being walked

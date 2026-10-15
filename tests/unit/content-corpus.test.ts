@@ -46,6 +46,19 @@ describe("PATTERNS (the shipped corpus)", () => {
     }
   });
 
+  it("derives every slug from the title the way LeetCode does, so links don't 404", () => {
+    const kebab = (title: string) =>
+      title
+        .toLowerCase()
+        .replace(/[^a-z0-9 -]/g, "")
+        .trim()
+        .replace(/[\s-]+/g, "-");
+    const mismatched = allProblems
+      .filter(({ problem }) => kebab(problem.title) !== problem.slug)
+      .map(({ problem }) => `${problem.slug} <- "${problem.title}"`);
+    expect(mismatched).toEqual([]);
+  });
+
   it("has no blank or padded text fields", () => {
     for (const p of PATTERNS) {
       expect(p.name.trim()).toBe(p.name);

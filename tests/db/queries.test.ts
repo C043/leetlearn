@@ -41,6 +41,14 @@ describe("getPattern", () => {
     expect(await getPattern(order)).toBeNull();
   });
 
+  it.each([1.5, NaN, Infinity, 2147483648, 99999999999, -2147483649])(
+    "returns null (instead of a database error) for the order %j",
+    async (order) => {
+      await insertPatterns(1);
+      expect(await getPattern(order)).toBeNull();
+    },
+  );
+
   it("returns the pattern with its 10 problems sorted by order", async () => {
     await insertPatterns(2);
     const view = await getPattern(2);

@@ -19,7 +19,7 @@ export default defineSolutions({
     space: "O(1)",
   },
 
-  "check-if-a-word-occurs-as-a-prefix-of-a-word-in-a-sentence": {
+  "check-if-a-word-occurs-as-a-prefix-of-any-word-in-a-sentence": {
     idea: "Split the sentence into words and return the 1-based index of the first word that **starts with** `searchWord`, or `-1`.",
     steps: [
       {

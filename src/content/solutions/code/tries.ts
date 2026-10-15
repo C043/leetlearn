@@ -17,7 +17,7 @@ class Solution:
         return first
 `,
 
-  "check-if-a-word-occurs-as-a-prefix-of-a-word-in-a-sentence": `
+  "check-if-a-word-occurs-as-a-prefix-of-any-word-in-a-sentence": `
 class Solution:
     def isPrefixOfWord(self, sentence: str, searchWord: str) -> int:
         # Words are numbered from 1

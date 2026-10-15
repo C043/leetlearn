@@ -10,7 +10,10 @@ E2E_PORT="${E2E_PORT:-3100}"
 step() { printf '\n\033[1;36m==> %s\033[0m\n' "$1"; }
 
 step "Typecheck"
+# Generates the route types (e.g. LayoutProps) that `next build` would otherwise create
+npx next typegen
 npx tsc --noEmit
+npx tsc --noEmit -p tests/tsconfig.json
 
 step "Lint"
 npx eslint .

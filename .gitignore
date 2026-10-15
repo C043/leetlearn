@@ -42,3 +42,6 @@ yarn-error.log*
 next-env.d.ts
 
 docker-compose.override.yml
+
+# python test harness
+__pycache__/

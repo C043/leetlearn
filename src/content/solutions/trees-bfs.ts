@@ -69,7 +69,7 @@ export default defineSolutions({
     space: "O(w)",
   },
 
-  "populate-next-right-pointers-in-each-node": {
+  "populating-next-right-pointers-in-each-node": {
     idea: "The tree is **perfect**, so once a level's `next` pointers are set, you can walk that level like a linked list and wire up the level below. No queue needed: O(1) extra space.",
     steps: [
       {

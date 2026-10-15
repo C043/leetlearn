@@ -39,7 +39,11 @@ export async function getPatternSummaries(): Promise<PatternSummary[]> {
   }));
 }
 
+/** Pattern.order is a Postgres INT4; anything outside it can't match and would make the query throw. */
+const isInt4 = (n: number) => Number.isInteger(n) && n >= -2_147_483_648 && n <= 2_147_483_647;
+
 export async function getPattern(order: number) {
+  if (!isInt4(order)) return null;
   const pattern = await prisma.pattern.findUnique({
     where: { order },
     include: {

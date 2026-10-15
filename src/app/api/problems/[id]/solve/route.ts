@@ -31,6 +31,11 @@ export async function POST(
     return NextResponse.json({ error: "Problem is locked" }, { status: 409 });
   }
 
+  // Before stamping lastSolvedAt: on a fresh database the activity backfill
+  // reads lastSolvedAt, and would otherwise count this solve twice
+  await rememberTimeZone(parsed.data.timeZone);
+  const firstToday = await recordActivity();
+
   const [updated] = await prisma.$transaction([
     prisma.problem.update({
       where: { id },
@@ -49,8 +54,6 @@ export async function POST(
     }),
   ]);
 
-  await rememberTimeZone(parsed.data.timeZone);
-  const firstToday = await recordActivity();
   const streak = await getStreak();
 
   return NextResponse.json({ ...updated, streak, streakExtended: firstToday });
