@@ -18,6 +18,7 @@ Instead of solving random problems, LeetLearn provides 16 pattern-based learning
 - 15-Minute Benchmark: Track whether problems were completed in under 15 minutes to identify weak spots.
 - Practice Timer: Optional per-problem 15-minute countdown that plays a chime when time is up. The timer resets whenever the problem modal is closed. The timer is purely a utility and never records anything about the solve.
 - Solution Walkthroughs: Every problem has a dedicated page at `/solutions/<slug>` with the key idea, numbered steps illustrated by inline SVG diagrams (arrays, grids, trees, linked lists, graphs, intervals, histograms and stacks), a Python reference solution with syntax highlighting and a copy button, time and space complexity, and common pitfalls.
+- Training Mode: Each problem has 10 exercises that drill the reasoning behind its solution: fill-in-the-blank code, tracing a line of the solution by hand, and multiple-choice questions on the key idea and on time and space complexity. Wrong answers get feedback specific to the mistake and go to the back of the queue, so a session ends once every exercise has been answered correctly. Train a single problem from its modal, or train 10 random exercises from the solved problems of a path. Finishing a single problem's session 10/10 on the first try marks it as mastered and turns its path node violet. Exercises are being added path by path; paths without them yet show no training buttons.
 - Video Links: Each problem links to a curated video walkthrough, falling back to a YouTube search for the problem.
 - Installable PWA: Web app manifest, app icons and a service worker allow installing LeetLearn on desktop and mobile. Pages are network-first with a cached fallback and an offline page; static assets are cache-first.
 - Daily Streak: Solving at least one problem a day (in your own time zone) grows a Duolingo-style streak shown as a flame in the header, with a 7-day calendar, longest streak and a full-screen "day streak!" celebration on the first solve of each day. Re-solving review problems counts too.
@@ -78,6 +79,17 @@ Walkthroughs live in `src/content/solutions/*.ts`, one file per path, keyed by p
 
 The Python code for each problem lives in `src/content/solutions/code/*.ts`, with the same file layout and slugs. It is validated the same way: every problem needs code, and every snippet must match a problem.
 
+### Editing Training Exercises
+
+Exercises live in `src/content/exercises/*.ts`, one file per path, keyed by problem slug, with the types in `src/content/exercises/types.ts`. There are two kinds:
+
+- `type`: the answer is typed and compared after normalization: case, whitespace and wrapping quotes are ignored, `²` and `**` become `^`, and big-O answers match with or without `O(...)`. An optional `mistakes` list maps common wrong answers to targeted feedback.
+- `choice`: multiple choice, where every wrong option carries a `why` explaining the mistake.
+
+Set `code` to show a snippet, with `___` marking the blank, or `solution: true` to show the full reference solution. Each exercise is shown under the problem's `summary`, a one or two sentence description of the problem set in `src/content/patterns/*.ts`.
+
+The set is validated at build time by `src/content/exercises/index.ts`: a path with exercises must cover all 10 of its problems, each problem needs exactly 10 exercises with at least 5 typed, complexity questions must be `choice` with `solution: true`, and every problem with exercises needs a `summary`. To add training to another path, create its file and register it in `src/content/exercises/index.ts`.
+
 ### Progressive Web App
 
 The service worker is only registered in production builds (`npm run build && npm start`, or the Docker image). To install the app, open LeetLearn in a supporting browser and use its "Install" or "Add to Home Screen" option. When offline, previously visited pages are served from the cache and other pages show `public/offline.html`.
@@ -89,7 +101,7 @@ git pull
 docker compose up -d --build
 ```
 
-The container runs `prisma db push` on boot. Schema changes are additive (new tables only), so your progress is kept. Existing solves are used to backfill the streak history on first load.
+The container runs `prisma db push` on boot. Schema changes are additive (new tables and nullable columns only), so your progress is kept. Existing solves are used to backfill the streak history on first load.
 
 ### Streak Reminders (Push Notifications)
 
@@ -106,6 +118,21 @@ Open the flame in the header and tap **Turn on reminders**, then **Send test** t
 
 - Each calendar day with at least one solve is stored in `ActivityDay`. The streak is the run of consecutive days ending today, or yesterday if you haven't solved anything yet today.
 - The scheduler checks every 10 minutes. If the streak is still alive but nothing has been solved today, it sends the evening nudge once the reminder hour passes and the last call at 22:00, each at most once a day.
+
+---
+
+## Training Mode
+
+![Two Pointers path with mastered problems in violet and the Train 10 random button](docs/screenshots/training-path.png)
+
+![Fill-in-the-blank exercise for 3Sum with a typed answer](docs/screenshots/training-typed.png)
+
+![Multiple-choice exercise for Container With Most Water showing feedback for the chosen wrong answer](docs/screenshots/training-choice.png)
+
+- Training unlocks per problem once it is solved. Open a solved problem and choose **Train**, or use **Train 10 random** at the top of a path.
+- `/train/<slug>` runs the 10 exercises of one problem. `/patterns/<order>/train` deals 10 exercises round-robin across the solved problems of the path, so no single problem crowds out the others.
+- Exercises are shuffled on every visit. A wrong answer shows the correct answer and an explanation, then returns at the end of the queue.
+- Training is practice only: it never changes solved state, the review queue or the streak. The single exception is mastery, recorded in `Problem.trainingMasteredAt` when a single problem's session is finished with all 10 exercises right on the first try. Mastery is never cleared, and mixed path sessions do not award it.
 
 ---
 
