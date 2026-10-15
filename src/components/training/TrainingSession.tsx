@@ -213,7 +213,6 @@ export default function TrainingSession({
         {current.kind === "type" ? (
           <input
             key={turn}
-            autoFocus
             value={input}
             onChange={(e) => setInput(e.target.value)}
             readOnly={!!feedback}
