@@ -39,19 +39,27 @@ export function addDays(day: string, n: number): string {
   return d.toISOString().slice(0, 10);
 }
 
+/**
+ * Create the single settings row if it's missing. Prisma's upsert runs as a
+ * read then an insert, so parallel first requests on an empty database both
+ * insert id 1 and one fails with P2002. `skipDuplicates` is a single
+ * INSERT ... ON CONFLICT DO NOTHING, which is safe to race.
+ */
+export async function ensureSettings() {
+  await prisma.appSettings.createMany({ data: [{ id: 1 }], skipDuplicates: true });
+}
+
 export async function getSettings() {
-  return prisma.appSettings.upsert({ where: { id: 1 }, update: {}, create: { id: 1 } });
+  await ensureSettings();
+  return prisma.appSettings.findUniqueOrThrow({ where: { id: 1 } });
 }
 
 /** Remember the user's zone so "today" and reminders follow their clock. */
 export async function rememberTimeZone(tz: unknown) {
   const timeZone = normalizeTimeZone(tz);
   if (!timeZone) return;
-  await prisma.appSettings.upsert({
-    where: { id: 1 },
-    update: { timeZone },
-    create: { id: 1, timeZone },
-  });
+  await ensureSettings();
+  await prisma.appSettings.update({ where: { id: 1 }, data: { timeZone } });
 }
 
 /**

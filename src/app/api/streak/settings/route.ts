@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
+import { ensureSettings } from "@/lib/streak";
 import { LAST_CALL_HOUR } from "@/lib/streak-config";
 
 const bodySchema = z.object({
@@ -15,10 +16,10 @@ export async function PATCH(request: Request) {
       { status: 400 },
     );
   }
-  const settings = await prisma.appSettings.upsert({
+  await ensureSettings();
+  const settings = await prisma.appSettings.update({
     where: { id: 1 },
-    update: { reminderHour: parsed.data.reminderHour },
-    create: { id: 1, reminderHour: parsed.data.reminderHour },
+    data: { reminderHour: parsed.data.reminderHour },
   });
   return NextResponse.json({ reminderHour: settings.reminderHour });
 }
