@@ -4,15 +4,17 @@ import { nextPathOrder, pathColor } from "@/lib/path-tiles";
 import type { PatternSummary } from "@/lib/types";
 
 function PathTile({ pattern, isNext }: { pattern: PatternSummary; isNext: boolean }) {
-  const { order, name, solved, total } = pattern;
+  const { order, name, solved, mastered, total } = pattern;
   const done = total > 0 && solved === total;
+  // Every problem also trained 10/10 on the first try: violet, like mastered nodes inside the path
+  const allMastered = done && mastered === total;
   const percent = total === 0 ? 0 : Math.round((solved / total) * 100);
   const color = pathColor(order);
 
   return (
     <Link
       href={`/patterns/${order}`}
-      aria-label={`Path ${order}: ${name}, ${solved} of ${total} solved${done ? ", complete" : ""}`}
+      aria-label={`Path ${order}: ${name}, ${solved} of ${total} solved${allMastered ? ", mastered" : done ? ", complete" : ""}`}
       className={`btn-3d relative flex h-full flex-col rounded-3xl border-2 p-4 text-white [--depth:6px] ${color.tile} ${
         isNext ? "ring-4 ring-amber-300 ring-offset-2 ring-offset-[var(--background)]" : ""
       }`}
@@ -32,14 +34,18 @@ function PathTile({ pattern, isNext }: { pattern: PatternSummary; isNext: boolea
           <span className="min-w-0">{name}</span>
         </h2>
         {done && (
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-full border-2 border-amber-500 bg-amber-300 text-amber-700">
+          <span
+            className={`flex size-10 shrink-0 items-center justify-center rounded-full border-2 ${
+              allMastered ? "border-violet-700 bg-violet-400 text-violet-900" : "border-amber-500 bg-amber-300 text-amber-700"
+            }`}
+          >
             <Crown className="size-5" strokeWidth={2.5} fill="currentColor" />
           </span>
         )}
       </div>
       <div className="mt-3">
         <div className="mb-1 flex items-center justify-between text-xs font-extrabold uppercase tracking-wide text-white/85">
-          <span>{done ? "Complete" : "Progress"}</span>
+          <span>{allMastered ? "Mastered" : done ? "Complete" : "Progress"}</span>
           <span>
             {solved}/{total}
           </span>
@@ -52,7 +58,7 @@ function PathTile({ pattern, isNext }: { pattern: PatternSummary; isNext: boolea
           className="h-3 overflow-hidden rounded-full bg-black/20"
         >
           <div
-            className={`h-full rounded-full ${done ? "bg-amber-300" : color.bar}`}
+            className={`h-full rounded-full ${allMastered ? "bg-violet-400" : done ? "bg-amber-300" : color.bar}`}
             style={{ width: `${percent}%` }}
           />
         </div>

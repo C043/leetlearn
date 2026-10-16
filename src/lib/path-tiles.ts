@@ -13,7 +13,7 @@ export interface PathColor {
 export const PATH_COLORS: readonly PathColor[] = [
   { tile: "border-green-700 bg-green-500 hover:bg-green-400", badge: "text-green-600", bar: "bg-white" },
   { tile: "border-sky-700 bg-sky-500 hover:bg-sky-400", badge: "text-sky-600", bar: "bg-white" },
-  { tile: "border-violet-700 bg-violet-500 hover:bg-violet-400", badge: "text-violet-600", bar: "bg-white" },
+  { tile: "border-blue-800 bg-blue-600 hover:bg-blue-500", badge: "text-blue-600", bar: "bg-white" },
   { tile: "border-orange-700 bg-orange-500 hover:bg-orange-400", badge: "text-orange-600", bar: "bg-white" },
   { tile: "border-pink-700 bg-pink-500 hover:bg-pink-400", badge: "text-pink-600", bar: "bg-white" },
   { tile: "border-teal-700 bg-teal-500 hover:bg-teal-400", badge: "text-teal-600", bar: "bg-white" },

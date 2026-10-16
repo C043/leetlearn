@@ -28,13 +28,14 @@ function toView(problem: Problem & { pattern: Pick<Pattern, "name"> }): ProblemV
 export async function getPatternSummaries(): Promise<PatternSummary[]> {
   const patterns = await prisma.pattern.findMany({
     orderBy: { order: "asc" },
-    include: { problems: { select: { isSolved: true } } },
+    include: { problems: { select: { isSolved: true, trainingMasteredAt: true } } },
   });
   return patterns.map((p) => ({
     id: p.id,
     name: p.name,
     order: p.order,
     solved: p.problems.filter((x) => x.isSolved).length,
+    mastered: p.problems.filter((x) => x.isSolved && x.trainingMasteredAt !== null).length,
     total: p.problems.length,
   }));
 }

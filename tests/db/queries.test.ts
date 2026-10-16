@@ -16,10 +16,18 @@ describe("getPatternSummaries", () => {
     for (const p of c.problems) await markSolved(p.id, new Date());
 
     expect(await getPatternSummaries()).toEqual([
-      { id: a.id, name: PATTERNS[0].name, order: 1, solved: 2, total: 10 },
-      { id: b.id, name: PATTERNS[1].name, order: 2, solved: 0, total: 10 },
-      { id: c.id, name: PATTERNS[2].name, order: 3, solved: 10, total: 10 },
+      { id: a.id, name: PATTERNS[0].name, order: 1, solved: 2, mastered: 0, total: 10 },
+      { id: b.id, name: PATTERNS[1].name, order: 2, solved: 0, mastered: 0, total: 10 },
+      { id: c.id, name: PATTERNS[2].name, order: 3, solved: 10, mastered: 0, total: 10 },
     ]);
+  });
+
+  it("counts only solved problems with training mastered as mastered", async () => {
+    const [a] = await insertPatterns(1);
+    await markSolved(a.problems[0].id, new Date());
+    await prisma.problem.update({ where: { id: a.problems[0].id }, data: { trainingMasteredAt: new Date() } });
+    await prisma.problem.update({ where: { id: a.problems[1].id }, data: { trainingMasteredAt: new Date() } });
+    expect(await getPatternSummaries()).toMatchObject([{ solved: 1, mastered: 1 }]);
   });
 
   it("orders by pattern order even when inserted out of order", async () => {

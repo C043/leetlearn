@@ -19,7 +19,7 @@ describe("pathColor", () => {
 });
 
 describe("nextPathOrder", () => {
-  const p = (order: number, solved: number, total = 10) => ({ id: `${order}`, name: `P${order}`, order, solved, total });
+  const p = (order: number, solved: number, total = 10) => ({ id: `${order}`, name: `P${order}`, order, solved, mastered: 0, total });
 
   it("is the first path that still has unsolved problems", () => {
     expect(nextPathOrder([p(1, 10), p(2, 4), p(3, 0)])).toBe(2);

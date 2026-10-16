@@ -3,11 +3,12 @@ import { describe, expect, it } from "vitest";
 import PathGrid from "@/components/duolingo/PathGrid";
 import type { PatternSummary } from "@/lib/types";
 
-const p = (order: number, solved: number, total = 10): PatternSummary => ({
+const p = (order: number, solved: number, total = 10, mastered = 0): PatternSummary => ({
   id: `id-${order}`,
   name: `Pattern ${order}`,
   order,
   solved,
+  mastered,
   total,
 });
 
@@ -37,6 +38,16 @@ describe("PathGrid", () => {
     render(<PathGrid patterns={[p(1, 10), p(2, 9)]} />);
     expect(screen.getByRole("link", { name: /Pattern 1/ })).toHaveAccessibleName(/complete/i);
     expect(screen.getByRole("link", { name: /Pattern 2/ })).not.toHaveAccessibleName(/complete/i);
+  });
+
+  it("marks paths whose problems are all trained 10/10 as mastered", () => {
+    render(<PathGrid patterns={[p(1, 10, 10, 10), p(2, 10, 10, 9)]} />);
+    const mastered = screen.getByRole("link", { name: /Pattern 1/ });
+    expect(mastered).toHaveAccessibleName(/mastered/i);
+    expect(within(mastered).getByText("Mastered")).toBeInTheDocument();
+    const complete = screen.getByRole("link", { name: /Pattern 2/ });
+    expect(complete).not.toHaveAccessibleName(/mastered/i);
+    expect(within(complete).getByText("Complete")).toBeInTheDocument();
   });
 
   it("flags only the next path to work on", () => {

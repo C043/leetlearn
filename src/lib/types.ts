@@ -26,6 +26,8 @@ export interface PatternSummary {
   name: string;
   order: number;
   solved: number;
+  /** Solved and trained 10/10 on the first try. */
+  mastered: number;
   total: number;
 }
 
