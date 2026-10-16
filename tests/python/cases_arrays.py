@@ -133,14 +133,30 @@ def _(ns):
         assert f(list(nums)) == brute, nums
 
 
-@case("most-common-word")
+def boats_brute(people, limit):
+    if not people:
+        return 0
+    first, rest = people[0], people[1:]
+    best = 1 + boats_brute(rest, limit)
+    for j, other in enumerate(rest):
+        if first + other <= limit:
+            best = min(best, 1 + boats_brute(rest[:j] + rest[j + 1 :], limit))
+    return best
+
+
+@case("boats-to-save-people")
 def _(ns):
-    f = S(ns).mostCommonWord
-    assert f("Bob hit a ball, the hit BALL flew far after it was hit.", ["hit"]) == "ball"
-    assert f("a.", []) == "a"
-    assert f("a, a, a, a, b,b,b,c, c", ["a"]) == "b"
-    assert f("Bob. hIt, baLl", ["bob", "hit"]) == "ball"
-    assert f("abc abc? abcd the jeff!", ["abc", "abcd", "jeff"]) == "the"
+    f = S(ns).numRescueBoats
+    assert f([1, 2], 3) == 1
+    assert f([3, 2, 2, 1], 3) == 3
+    assert f([3, 5, 3, 4], 5) == 4
+    assert f([5], 5) == 1
+    assert f([2, 2], 4) == 1
+    r = rng(24)
+    for _ in range(300):
+        limit = r.randint(1, 12)
+        people = [r.randint(1, limit) for _ in range(r.randint(1, 8))]
+        assert f(list(people), limit) == boats_brute(people, limit), (people, limit)
 
 
 @case("trapping-rain-water")

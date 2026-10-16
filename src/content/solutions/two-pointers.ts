@@ -223,33 +223,34 @@ export default defineSolutions({
     pitfalls: ["Zeros can never be a side; sorting handles them naturally since `0 + b > c` fails."],
   },
 
-  "most-common-word": {
-    idea: "Normalize the text (lower-case, punctuation becomes spaces), split it into words, count them in a hash map while ignoring banned words, then take the maximum.",
+  "boats-to-save-people": {
+    idea: "Sort the weights. The heaviest person always needs a boat, and their best partner is the **lightest** person left: if even the lightest doesn't fit with them, nobody does. So `right` (heaviest) boards every boat, and `left` (lightest) joins whenever `people[left] + people[right] <= limit`.",
     steps: [
       {
-        text: "Tokenize `\"Bob hit a ball, the hit BALL flew far after it was hit.\"` with `banned = [\"hit\"]`.",
+        text: "Sort `people = [3, 2, 2, 1]` with `limit = 3`. `left` is the lightest, `right` the heaviest.",
         visual: {
           kind: "array",
-          values: ["bob", "hit", "a", "ball", "the", "hit", "ball", "flew", "far", "after", "it", "was", "hit"],
-          indices: false,
-          tones: { bad: [1, 5, 12], good: [3, 6] },
-          caption: "Red words are banned and skipped; green is the winner",
+          values: [1, 2, 2, 3],
+          pointers: [{ at: 0, label: "left" }, { at: 3, label: "right", tone: "bad" }],
+          tones: { bad: [3] },
+          caption: "1 + 3 > 3: nobody fits with 3, so it sails alone and right -= 1",
         },
       },
       {
-        text: "Count with a map, skipping words in a `banned` **set** (O(1) lookup).",
+        text: "Try the lightest with the next heaviest.",
         visual: {
-          kind: "grid",
-          colLabels: ["word", "count"],
-          rows: [["ball", 2], ["bob", 1], ["a", 1], ["the", 1], ["…", "…"]],
-          tones: { good: [[0, 0], [0, 1]] },
+          kind: "array",
+          values: [1, 2, 2, 3],
+          pointers: [{ at: 0, label: "left" }, { at: 2, label: "right" }],
+          tones: { good: [0, 2] },
+          caption: "1 + 2 ≤ 3: they share a boat, so both pointers move",
         },
       },
-      { text: "Return the word with the highest count: `\"ball\"`." },
+      { text: "Now `left == right`: the last person takes a boat alone. Total: 3 boats." },
     ],
-    time: "O(n + b)",
-    space: "O(n + b)",
-    pitfalls: ["Punctuation like `\"ball,\"` must become `\"ball\"`, so replace non-letters with spaces before splitting."],
+    time: "O(n log n)",
+    space: "O(1) extra",
+    pitfalls: ["Loop while `left <= right`, not `<`: when the pointers meet, one person is still on the shore and needs a boat."],
   },
 
   "trapping-rain-water": {

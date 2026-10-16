@@ -805,100 +805,103 @@ for largest in range(len(nums) - 1, ___, -1):`,
     },
   ],
 
-  "most-common-word": [
+  "boats-to-save-people": [
     {
       kind: "type",
-      prompt: "Fill in the method that keeps word characters.",
+      prompt: "Fill in the comparison that lets two people share a boat.",
       code: `
-normalized = "".join(
-    character.lower() if character.___() else " "
-    for character in paragraph
-)`,
-      answers: ["isalnum", "isalpha"],
-      explanation: "Letters are kept (lower-cased) and everything else becomes a space. The paragraph has no digits, so `isalpha` works too.",
+if people[left] + people[right] ___ limit:
+    left += 1`,
+      answers: ["<="],
+      explanation: "A boat can carry **up to** `limit`, so a pair that weighs exactly `limit` still fits.",
+      mistakes: [{ answers: ["<"], why: "Two people who weigh exactly `limit` together fit in one boat. With `<` they'd take two." }],
     },
     {
       kind: "type",
-      prompt: "Fill in the type that makes banned lookups O(1).",
+      prompt: "Fill in the loop condition.",
       code: `
-banned_set = ___(banned)`,
-      answers: ["set", "frozenset"],
-      explanation: "A set checks membership in O(1) on average. Checking a list scans all of it.",
-      mistakes: [{ answers: ["list"], why: "`word not in list` is O(b) per word. A set makes it O(1)." }],
+while left ___ right:`,
+      answers: ["<="],
+      explanation: "When `left == right`, one person is still on the shore and needs a boat of their own.",
+      mistakes: [{ answers: ["<"], why: "With `<`, the loop ends while one person is still waiting, so their boat is never counted." }],
     },
     {
       kind: "type",
-      prompt: "Fill in the index that extracts the word.",
+      prompt: "Fill in the pointer that moves on **every** boat.",
       code: `
-return counts.most_common(1)[0][___]`,
-      answers: ["0"],
-      explanation: "`most_common(1)` returns `[(word, count)]`. `[0]` takes the tuple and `[0]` again takes the word.",
-      mistakes: [{ answers: ["1"], why: "Index 1 of the tuple is the **count**. The problem wants the word." }],
+while left <= right:
+    if people[left] + people[right] <= limit:
+        left += 1
+    ___ -= 1
+    boats += 1`,
+      answers: ["right"],
+      explanation: "The heaviest person boards every boat. The lightest only joins when they fit.",
+      mistakes: [{ answers: ["left"], why: "`left` already moved inside the `if`, and only when the lightest person fits. The heaviest person always boards." }],
     },
     {
       kind: "type",
-      prompt: "`paragraph = \"Bob hit a ball, the hit BALL flew far after it was hit.\"`, `banned = [\"hit\"]`. What is returned?",
-      solution: true,
-      answers: ["ball"],
-      explanation: "`hit` appears 3 times but is banned. `ball` appears twice (`ball,` and `BALL`), more than any other word.",
-      mistakes: [{ answers: ["hit"], why: "`hit` is the most frequent word, but it's banned." }],
+      prompt: "Fill in the first step.",
+      code: `
+people.___()
+left, right = 0, len(people) - 1`,
+      answers: ["sort"],
+      explanation: "The pointers only mean \"lightest\" and \"heaviest\" once the weights are sorted.",
+      mistakes: [{ answers: ["reverse"], why: "Reversing doesn't order the weights. The pointers need sorted order." }],
     },
     {
       kind: "type",
-      prompt: "`paragraph = \"a, a, a, a, b,b,b,c, c\"`, `banned = [\"a\"]`. What is returned?",
+      prompt: "`people = [1, 2]`, `limit = 3`. What is returned?",
       solution: true,
-      answers: ["b"],
-      explanation: "Punctuation becomes spaces, so `b,b,b` splits into three `b`s. `a` is banned, so `b` (3) beats `c` (2).",
-      mistakes: [{ answers: ["c"], why: "If you deleted commas instead of turning them into spaces, `b,b,b` would merge into `bbb`. As spaces, it's three separate `b`s." }],
+      answers: ["1"],
+      explanation: "`1 + 2 = 3 <= 3`, so both fit in one boat.",
+      mistakes: [{ answers: ["2"], why: "The limit is inclusive: a total of exactly 3 fits." }],
     },
     {
       kind: "type",
-      prompt: "`paragraph = \"a.\"`, `banned = []`. What is returned?",
+      prompt: "`people = [3, 2, 2, 1]`, `limit = 3`. What is returned?",
       solution: true,
-      answers: ["a"],
-      explanation: "The period becomes a space, which leaves the single word `a`.",
+      answers: ["3"],
+      explanation: "Sorted: `[1, 2, 2, 3]`. The 3 sails alone, 1 + 2 share a boat, and the last 2 sails alone.",
     },
     {
-      kind: "choice",
-      prompt: "With n = paragraph length and b = total length of `banned`, what is the time complexity?",
+      kind: "type",
+      prompt: "`people = [3, 5, 3, 4]`, `limit = 5`. What is returned?",
       solution: true,
-      options: [
-        { text: "O(n + b)", correct: true },
-        { text: "O(n)", why: "Building the banned set also costs O(b)." },
-        { text: "O(n · b)", why: "That's what you'd pay checking each word against a banned **list**. The set makes each check O(1)." },
-      ],
-      explanation: "Normalizing and counting take O(n); building the banned set takes O(b).",
+      answers: ["4"],
+      explanation: "Even the lightest pair is 3 + 3 = 6 > 5, so nobody can share. Everyone sails alone.",
+      mistakes: [{ answers: ["3", "2"], why: "Check the lightest pair: 3 + 3 = 6 is already over the limit, so no two people fit together." }],
     },
     {
       kind: "choice",
-      prompt: "Why turn punctuation into a **space** instead of deleting it?",
-      options: [
-        { text: "Deleting would merge words, e.g. `\"b,b,b\"` → `\"bbb\"`", correct: true },
-        { text: "`split()` needs at least one space", why: "`split()` works on any string. The issue is words merging together." },
-        { text: "Deleting is slower", why: "Both are O(n). It's about getting the right answer, not speed." },
-      ],
-      explanation: "Punctuation can be the only thing separating two words. A space keeps them apart; `split()` then ignores repeated spaces.",
-    },
-    {
-      kind: "choice",
-      prompt: "Why lower-case every character?",
-      options: [
-        { text: "Words are case-insensitive: `Bob` and `bob` must count as one word", correct: true },
-        { text: "`Counter` only accepts lower-case strings", why: "`Counter` accepts any hashable value." },
-        { text: "The `banned` list may contain upper-case words", why: "The problem says `banned` is lower-case. The paragraph is the mixed-case input." },
-      ],
-      explanation: "Without lower-casing, `BALL` and `ball` would be counted separately and the answer could change.",
-    },
-    {
-      kind: "choice",
-      prompt: "What does `counts.most_common(1)` return?",
+      prompt: "What is the time complexity?",
       solution: true,
       options: [
-        { text: "A list with one `(word, count)` tuple", correct: true },
-        { text: "The most common word as a string", why: "It always returns a list of tuples, even with `1`. That's why the code indexes `[0][0]`." },
-        { text: "The highest count as an int", why: "The count is inside the tuple, at index 1." },
+        { text: "O(n log n)", correct: true },
+        { text: "O(n)", why: "The pointer scan is O(n), but sorting first costs O(n log n)." },
+        { text: "O(n²)", why: "That's trying every pair. Each step moves at least one pointer, so the scan is linear." },
       ],
-      explanation: "`most_common(k)` returns the top k `(element, count)` pairs, sorted by count.",
+      explanation: "Sorting dominates. The scan afterwards is a single O(n) pass.",
+    },
+    {
+      kind: "choice",
+      prompt: "Why try to pair the heaviest person with the **lightest** one?",
+      options: [
+        { text: "If the lightest can't fit with the heaviest, nobody can, so the heaviest must sail alone", correct: true },
+        { text: "It keeps the boats balanced", why: "Only the total weight matters, not balance." },
+        { text: "It keeps each boat as light as possible", why: "The goal is fewer boats, not lighter ones." },
+      ],
+      explanation: "The lightest person is the heaviest person's best chance at a partner. One comparison settles whether the heaviest shares a boat.",
+    },
+    {
+      kind: "choice",
+      prompt: "When `people[left] + people[right] > limit`, why is it safe to send `people[right]` alone?",
+      solution: true,
+      options: [
+        { text: "Everyone else left weighs at least `people[left]`, so nobody fits with them", correct: true },
+        { text: "So the loop is guaranteed to end", why: "The loop would end either way. The reason is that waiting can't help: there's no lighter partner left." },
+        { text: "The heaviest person always has to board first", why: "The problem has no boarding order. It's about who can still share a boat." },
+      ],
+      explanation: "In sorted order, `people[left]` is the lightest person left. If they don't fit with `people[right]`, no one does.",
     },
   ],
 

@@ -72,12 +72,12 @@ export default definePattern({
         "Given an array of side lengths `nums`, count the triplets of indices whose values can form a triangle: each pair of sides must add up to **more** than the third.",
     },
     {
-      slug: "most-common-word",
-      title: "Most Common Word",
+      slug: "boats-to-save-people",
+      title: "Boats to Save People",
       difficulty: "MEDIUM",
-      leetcodeUrl: "https://leetcode.com/problems/most-common-word/",
+      leetcodeUrl: "https://leetcode.com/problems/boats-to-save-people/",
       summary:
-        "Given a `paragraph` and a list of `banned` words, return the most frequent word that isn't banned, in lower case. Words are case-insensitive and punctuation is ignored.",
+        "`people[i]` is the weight of person `i`. Each boat carries **at most two** people, as long as their total weight is at most `limit`. Return the minimum number of boats needed to carry everyone. Nobody weighs more than `limit`.",
     },
     {
       slug: "trapping-rain-water",

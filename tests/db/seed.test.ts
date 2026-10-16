@@ -85,6 +85,43 @@ describe("prisma/seed.ts", { timeout: 120_000 }, () => {
     });
   });
 
+  it("resets progress when a slot now holds a different problem, but keeps it unlocked", async () => {
+    await seed();
+    const pattern = await prisma.pattern.findUniqueOrThrow({ where: { order: 1 } });
+    const solvedAt = new Date("2024-03-03T03:03:03Z");
+    const slot = { patternId: pattern.id, order: 9 };
+    // Simulate a production row whose slot used to hold another problem
+    await prisma.problem.updateMany({
+      where: slot,
+      data: {
+        leetcodeUrl: "https://leetcode.com/problems/old/",
+        unlocked: true,
+        isSolved: true,
+        solvedUnder15Min: true,
+        lastSolvedAt: solvedAt,
+        inReview: true,
+        addedToReviewAt: solvedAt,
+        trainingMasteredAt: solvedAt,
+      },
+    });
+    await prisma.problem.updateMany({ where: { patternId: pattern.id, order: 8 }, data: { isSolved: true, lastSolvedAt: solvedAt } });
+
+    await seed();
+
+    expect(await prisma.problem.findFirstOrThrow({ where: slot })).toMatchObject({
+      leetcodeUrl: PATTERNS[0].problems[8].leetcodeUrl,
+      unlocked: true,
+      isSolved: false,
+      solvedUnder15Min: false,
+      lastSolvedAt: null,
+      inReview: false,
+      addedToReviewAt: null,
+      trainingMasteredAt: null,
+    });
+    // Neighbouring slots keep their progress
+    expect((await prisma.problem.findFirstOrThrow({ where: { patternId: pattern.id, order: 8 } })).isSolved).toBe(true);
+  });
+
   it("keeps the same row ids across re-seeds (so progress stays attached)", async () => {
     await seed();
     const ids = (await prisma.problem.findMany({ select: { id: true }, orderBy: { id: "asc" } })).map((p) => p.id);

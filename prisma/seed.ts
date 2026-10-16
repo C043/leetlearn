@@ -5,7 +5,8 @@ const prisma = new PrismaClient();
 
 /**
  * Idempotent: content fields are refreshed from src/content, but progress
- * (isSolved, unlocked, review state, ...) is never overwritten on re-seed.
+ * (isSolved, unlocked, review state, ...) is never overwritten on re-seed,
+ * except when a slot's problem was replaced (its leetcodeUrl changed).
  */
 async function main() {
   for (const patternData of PATTERNS) {
@@ -24,12 +25,25 @@ async function main() {
 
     for (const [i, prob] of patternData.problems.entries()) {
       const order = i + 1;
+      const where = { patternId_order: { patternId: pattern.id, order } };
+      // Progress belongs to the slot, so a slot that now holds a different
+      // problem starts over instead of inheriting the old problem's solve
+      const existing = await prisma.problem.findUnique({ where, select: { leetcodeUrl: true } });
+      const replaced = existing !== null && existing.leetcodeUrl !== prob.leetcodeUrl;
       await prisma.problem.upsert({
-        where: { patternId_order: { patternId: pattern.id, order } },
+        where,
         update: {
           title: prob.title,
           leetcodeUrl: prob.leetcodeUrl,
           difficulty: prob.difficulty,
+          ...(replaced && {
+            isSolved: false,
+            solvedUnder15Min: false,
+            lastSolvedAt: null,
+            inReview: false,
+            addedToReviewAt: null,
+            trainingMasteredAt: null,
+          }),
         },
         create: {
           title: prob.title,

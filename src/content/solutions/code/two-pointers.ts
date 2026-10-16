@@ -223,19 +223,27 @@ class Solution:
         return count
 `,
 
-  "most-common-word": `
-from collections import Counter
-
+  "boats-to-save-people": `
 class Solution:
-    def mostCommonWord(self, paragraph: str, banned: list[str]) -> str:
-        # Lower-case letters and turn punctuation into spaces
-        normalized = "".join(character.lower() if character.isalnum() else " " for character in paragraph)
-        # A set makes the banned lookup fast
-        banned_set = set(banned)
-        # Count every word that is not banned
-        counts = Counter(word for word in normalized.split() if word not in banned_set)
-        # The single most frequent word
-        return counts.most_common(1)[0][0]
+    def numRescueBoats(self, people: list[int], limit: int) -> int:
+        # Sorting puts the lightest people first and the heaviest last
+        people.sort()
+        # Lightest and heaviest person still on the shore
+        left, right = 0, len(people) - 1
+        # Boats used so far
+        boats = 0
+        # Keep going while someone is waiting, including a last lone person
+        while left <= right:
+            # The lightest person fits next to the heaviest one
+            if people[left] + people[right] <= limit:
+                # So the lightest person boards too
+                left += 1
+            # The heaviest person boards every boat
+            right -= 1
+            # One more boat has left
+            boats += 1
+        # Total boats needed
+        return boats
 `,
 
   "trapping-rain-water": `
