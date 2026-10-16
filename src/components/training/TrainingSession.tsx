@@ -93,6 +93,8 @@ export default function TrainingSession({
     setChoice(null);
     setFeedback(null);
     setTurn((t) => t + 1);
+    // Long snippets can leave the page scrolled down; start each exercise at the top
+    window.scrollTo({ top: 0 });
   }
 
   // Enter checks / continues; number keys pick an option

@@ -11,6 +11,7 @@ const sounds = vi.hoisted(() => ({ playCorrect: vi.fn(), playWrong: vi.fn(), pla
 vi.mock("@/lib/training-sounds", () => sounds);
 
 const fetchMock = vi.fn<typeof fetch>();
+const scrollToMock = vi.fn();
 
 beforeEach(() => {
   router.refresh.mockReset();
@@ -18,6 +19,8 @@ beforeEach(() => {
   fetchMock.mockReset();
   fetchMock.mockResolvedValue(jsonResponse({ masteredAt: "2024-05-10T12:00:00.000Z" }));
   vi.stubGlobal("fetch", fetchMock);
+  scrollToMock.mockReset();
+  vi.stubGlobal("scrollTo", scrollToMock);
 });
 
 const base = { problemTitle: "Valid Palindrome", problemSummary: "Return `True` if it reads the same both ways." };
@@ -205,6 +208,14 @@ describe("the queue", () => {
     await typeAndCheck(user, "isalnum");
     await user.click(continueButton());
     expect(screen.getByText("Training complete!")).toBeInTheDocument();
+  });
+
+  it("scrolls back to the top when moving on to the next exercise", async () => {
+    const user = start([typedItem("a"), typedItem("b")]);
+    await typeAndCheck(user, "isalnum");
+    expect(scrollToMock).not.toHaveBeenCalled();
+    await user.click(continueButton());
+    expect(scrollToMock).toHaveBeenCalledWith({ top: 0 });
   });
 });
 
