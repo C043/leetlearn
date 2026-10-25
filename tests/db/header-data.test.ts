@@ -6,17 +6,16 @@ describe("getHeaderData", () => {
   it("works on an empty database", async () => {
     const { summaries, header } = await getHeaderData();
     expect(summaries).toEqual([]);
-    expect(header).toMatchObject({ solved: 0, total: 0, streak: { current: 0 }, prefs: { reminderHour: 20 } });
+    expect(header).toMatchObject({ streak: { current: 0 }, prefs: { reminderHour: 20 } });
     expect(header.prefs.vapidPublicKey.length).toBeGreaterThan(0);
   });
 
-  it("totals solved and available problems across every path", async () => {
+  it("summarises solved problems per path", async () => {
     const [a, , c] = await insertPatterns(3);
     await markSolved(a.problems[0].id, new Date());
     for (const p of c.problems) await markSolved(p.id, new Date());
-    const { summaries, header } = await getHeaderData();
+    const { summaries } = await getHeaderData();
     expect(summaries.map((s) => s.solved)).toEqual([1, 0, 10]);
-    expect(header).toMatchObject({ solved: 11, total: 30 });
   });
 
   it("passes the streak and reminder preferences through", async () => {

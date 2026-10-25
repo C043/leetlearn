@@ -160,22 +160,19 @@ describe("StreakCelebration", () => {
 });
 
 describe("AppHeader", () => {
-  it("links home and shows total progress and the streak", () => {
-    render(<AppHeader solved={37} total={160} streak={streakView({ current: 9 })} prefs={prefs} />);
+  it("links home and shows the streak", () => {
+    render(<AppHeader streak={streakView({ current: 9 })} prefs={prefs} />);
     expect(screen.getByRole("link", { name: "LeetLearn" })).toHaveAttribute("href", "/");
-    const progress = screen.getByTitle("Problems solved");
-    expect(progress).toHaveTextContent("37/ 160");
     expect(screen.getByRole("button", { name: "9 day streak" })).toBeInTheDocument();
   });
 
   it("links to the stats page", () => {
-    render(<AppHeader solved={0} total={160} streak={streakView()} prefs={prefs} />);
+    render(<AppHeader streak={streakView()} prefs={prefs} />);
     expect(screen.getByRole("link", { name: "Stats" })).toHaveAttribute("href", "/stats");
   });
 
-  it("highlights stats and hides the progress count on the stats page", () => {
-    render(<AppHeader solved={0} total={160} streak={streakView()} prefs={prefs} onStats />);
+  it("highlights the stats icon on the stats page", () => {
+    render(<AppHeader streak={streakView()} prefs={prefs} onStats />);
     expect(screen.getByRole("link", { name: "Stats" })).toHaveAttribute("aria-current", "page");
-    expect(screen.queryByTitle("Problems solved")).not.toBeInTheDocument();
   });
 });

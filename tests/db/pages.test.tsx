@@ -80,13 +80,6 @@ describe("/ (path selection)", () => {
     expect(await render()).toContain("All caught up!");
   });
 
-  it("shows total progress in the header", async () => {
-    const [a, b] = await insertPatterns(2);
-    await markSolved(a.problems[0].id, new Date());
-    await markSolved(b.problems[0].id, new Date());
-    expect(await render()).toMatch(/2<span[^>]*>\/ 20<\/span>/);
-  });
-
   it("runs a due review rotation on load (safety net for a missed cron)", async () => {
     const [a] = await insertPatterns(1);
     await markSolved(a.problems[0].id, new Date("2024-01-01T00:00:00Z"));
@@ -207,7 +200,7 @@ describe("/patterns/[order]", () => {
     expect(html).not.toContain(PATTERNS[1].problems[0].title);
   });
 
-  it("reflects progress in the header, the path and the node states", async () => {
+  it("reflects progress in the path and the node states", async () => {
     const [a, b] = await insertPatterns(2);
     await markSolved(a.problems[0].id, new Date());
     await markSolved(a.problems[1].id, new Date(), { under15: false });
@@ -215,7 +208,6 @@ describe("/patterns/[order]", () => {
     await markSolved(b.problems[0].id, new Date());
     const html = await render("1");
     expect(html).toContain("Path 1 · 2/10 solved");
-    expect(html).toMatch(/3<span[^>]*>\/ 20<\/span>/);
     expect((html.match(/\(completed\)/g) ?? []).length).toBe(2);
     expect((html.match(/\(available\)/g) ?? []).length).toBe(1);
     expect((html.match(/Took longer than 15 minutes/g) ?? []).length).toBe(1);

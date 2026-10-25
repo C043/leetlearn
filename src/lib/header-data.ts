@@ -13,8 +13,6 @@ export async function getHeaderData() {
   return {
     summaries,
     header: {
-      solved: summaries.reduce((n, p) => n + p.solved, 0),
-      total: summaries.reduce((n, p) => n + p.total, 0),
       streak,
       prefs: { reminderHour: settings.reminderHour, vapidPublicKey: vapid.publicKey },
     },
