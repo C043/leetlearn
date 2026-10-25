@@ -172,4 +172,10 @@ describe("AppHeader", () => {
     render(<AppHeader solved={0} total={160} streak={streakView()} prefs={prefs} />);
     expect(screen.getByRole("link", { name: "Stats" })).toHaveAttribute("href", "/stats");
   });
+
+  it("highlights stats and hides the progress count on the stats page", () => {
+    render(<AppHeader solved={0} total={160} streak={streakView()} prefs={prefs} onStats />);
+    expect(screen.getByRole("link", { name: "Stats" })).toHaveAttribute("aria-current", "page");
+    expect(screen.queryByTitle("Problems solved")).not.toBeInTheDocument();
+  });
 });

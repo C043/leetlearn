@@ -74,7 +74,7 @@ export default async function StatsPage() {
 
   return (
     <>
-      <AppHeader {...header} />
+      <AppHeader {...header} onStats />
       <main className="mx-auto max-w-2xl px-4 pb-12 pt-6">
         <BackToPaths />
 
