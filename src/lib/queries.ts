@@ -2,6 +2,8 @@ import type { Pattern, Problem } from "@prisma/client";
 import { hasExercises } from "@/content/exercises";
 import { slugFromUrl, videoUrlFor } from "@/content/solutions";
 import { prisma } from "./db";
+import { buildHeatmap, summarizeActivity, summarizeProblems } from "./stats";
+import { dayKey, getSettings, getStreak } from "./streak";
 import type { PatternSummary, ProblemView } from "./types";
 
 function toView(problem: Problem & { pattern: Pick<Pattern, "name"> }): ProblemView {
@@ -68,3 +70,37 @@ export async function getReviewQueue(): Promise<ProblemView[]> {
   });
   return problems.map(toView);
 }
+
+/** Everything the stats page shows, with "today" in the user's time zone. */
+export async function getStats(now: Date = new Date()) {
+  // First, so a database from before streaks gets its activity backfilled
+  const streak = await getStreak(now);
+  const [{ timeZone }, activity, problems] = await Promise.all([
+    getSettings(),
+    prisma.activityDay.findMany({ select: { day: true, solves: true } }),
+    prisma.problem.findMany({ include: { pattern: { select: { name: true, order: true } } } }),
+  ]);
+  const today = dayKey(now, timeZone);
+  return {
+    timeZone,
+    streak,
+    heatmap: buildHeatmap(activity, today),
+    activity: summarizeActivity(activity, today),
+    ...summarizeProblems(
+      problems.map((p) => ({
+        title: p.title,
+        slug: slugFromUrl(p.leetcodeUrl),
+        difficulty: p.difficulty,
+        isSolved: p.isSolved,
+        solvedUnder15Min: p.solvedUnder15Min,
+        lastSolvedAt: p.lastSolvedAt,
+        inReview: p.inReview,
+        mastered: p.trainingMasteredAt !== null,
+        patternName: p.pattern.name,
+        patternOrder: p.pattern.order,
+      })),
+    ),
+  };
+}
+
+export type StatsData = Awaited<ReturnType<typeof getStats>>;

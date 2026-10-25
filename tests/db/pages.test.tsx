@@ -3,11 +3,12 @@ import { describe, expect, it, vi } from "vitest";
 import Home from "@/app/page";
 import PatternPage from "@/app/patterns/[order]/page";
 import ReviewPage from "@/app/review/page";
+import StatsPage from "@/app/stats/page";
 import SolutionPage, { generateMetadata, generateStaticParams } from "@/app/solutions/[slug]/page";
 import { prisma } from "@/lib/db";
 import { PATTERNS } from "@/content";
 import { getCode, getSolution } from "@/content/solutions";
-import { insertPatterns, markSolved } from "../helpers/db";
+import { insertPatterns, markSolved, setActivityDays } from "../helpers/db";
 
 /** Next signals redirect / notFound by throwing an error with a `digest`. */
 async function digestOf(fn: () => Promise<unknown>) {
@@ -141,6 +142,34 @@ describe("/review", () => {
     for (let i = 0; i < 7; i++) await markSolved(a.problems[i].id, new Date(Date.UTC(2024, 0, i + 1)));
     await prisma.reviewSystemState.create({ data: { id: 1, lastRotatedAt: STALE_ROTATION } });
     expect(await render()).toContain("Spaced repetition · 5/5");
+  });
+});
+
+describe("/stats", () => {
+  const render = async () => decode(renderToString(await StatsPage()));
+
+  it("renders on an empty database", async () => {
+    const html = textOf(await render());
+    expect(html).toContain("Your stats");
+    expect(html).toContain("0 solves in the last year");
+  });
+
+  it("shows progress, per-path and per-difficulty breakdowns and recent solves", async () => {
+    const [a, b] = await insertPatterns(2);
+    await markSolved(a.problems[0].id, new Date());
+    await markSolved(a.problems[1].id, new Date(), { under15: false });
+    await markSolved(b.problems[0].id, new Date());
+    await setActivityDays([new Date().toISOString().slice(0, 10)]);
+    const html = await render();
+    const text = textOf(html);
+    expect(html).toContain('href="/"'); // back to paths
+    expect(text).toContain("3/20");
+    expect(text).toContain("67% under 15 min");
+    expect(text).toContain(`${PATTERNS[0].name}2/10`);
+    expect(text).toContain(`${PATTERNS[1].name}1/10`);
+    expect(text).toMatch(/Easy\s*3\/4/);
+    expect(text).toContain(a.problems[1].title);
+    expect(html).toContain(`href="/solutions/`);
   });
 });
 

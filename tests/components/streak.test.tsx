@@ -167,4 +167,9 @@ describe("AppHeader", () => {
     expect(progress).toHaveTextContent("37/ 160");
     expect(screen.getByRole("button", { name: "9 day streak" })).toBeInTheDocument();
   });
+
+  it("links to the stats page", () => {
+    render(<AppHeader solved={0} total={160} streak={streakView()} prefs={prefs} />);
+    expect(screen.getByRole("link", { name: "Stats" })).toHaveAttribute("href", "/stats");
+  });
 });

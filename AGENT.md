@@ -141,6 +141,7 @@ model PushSubscription {
 - Design Style: Duolingo-inspired path layout.
 - Path Selection (`/`): a Saturday Review tile on top (links to `/review`), then one big colorful tile per pattern with its progress bar; each pattern's color comes from `pathColor` (src/lib/path-tiles.ts), and the first unfinished pattern is flagged "Continue".
 - Path (`/patterns/[order]`) and Review (`/review`) pages: a single centered column with a "Back to paths" button; no sidebars.
+- Stats (`/stats`, linked from the header): read-only. Totals, rhythm, per-difficulty and per-path breakdowns, recent solves, and a GitHub-style activity graph of the last 53 weeks built from `ActivityDay`. The math is pure in src/lib/stats.ts; `getStats` (src/lib/queries.ts) only loads rows.
 - Path Visualization: Winding zigzag or snake path of circular buttons representing problem nodes.
 - Node States:
   - Locked: Grayed out with lock icon (unlocked = false).

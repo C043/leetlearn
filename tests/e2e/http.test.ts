@@ -18,7 +18,7 @@ describe("pages", () => {
     expect((html.match(/href="\/patterns\/\d+"/g) ?? []).length).toBe(16);
   });
 
-  it.each(["/patterns/1", "/patterns/16", "/review", "/solutions/valid-palindrome"])("serves %s", async (path) => {
+  it.each(["/patterns/1", "/patterns/16", "/review", "/stats", "/solutions/valid-palindrome"])("serves %s", async (path) => {
     expect((await get(path)).status).toBe(200);
   });
 

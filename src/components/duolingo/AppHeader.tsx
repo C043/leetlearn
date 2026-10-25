@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CircleCheck } from "lucide-react";
+import { ChartColumn, CircleCheck } from "lucide-react";
 import type { ReminderPrefs, StreakView } from "@/lib/types";
 import StreakButton from "../streak/StreakButton";
 
@@ -26,6 +26,14 @@ export default function AppHeader({
             {solved}
             <span className="text-sm font-bold text-zinc-400">/ {total}</span>
           </span>
+          <Link
+            href="/stats"
+            aria-label="Stats"
+            title="Stats"
+            className="flex size-9 items-center justify-center rounded-xl text-zinc-400 hover:bg-zinc-100 hover:text-sky-500 dark:hover:bg-zinc-800"
+          >
+            <ChartColumn className="size-5" strokeWidth={3} />
+          </Link>
           <StreakButton streak={streak} prefs={prefs} />
         </div>
       </div>
